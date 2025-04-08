@@ -7,17 +7,18 @@ addpath src
 % Hyper parameters Plasma
 Param = struct();
 Param.lr = 51;
-Param.K = 1000;                  % Time grid points
-Param.dt = 1e-7;                % Time separation  [s]
-Param.T = 1;
-Param.V0 = 0;                 % Voltage at r=1 and t=1  [V]
+Param.K = 100;                  % Time grid points
+Param.dt = 1e-4;                % Time separation  [s]
+Param.T = 0.1;
+% Param.V0 = 0;                 % Voltage at r=1 and t=1  [V]
 % Param.VT = 0;                 % Ending voltage at r=1 and t=K*dt  [V]
+Param.N = 1e7;                  % density constant [m-3]
 Param.tolError = 1e-3;
-% Param.alpha = 11396.798;  
-% Param.beta = 342439.622;  
+Param.alpha = 11396.798;  
+Param.beta = 342439.622;
 
-Param.stepBuffer = 0.78;  % lower to reduce swinging in dt
-Param.scalingPower = 0.29; % lower to reduce swinging in dt  
+Param.stepBuffer = 0.75;  % lower to reduce swinging in dt
+Param.scalingPower = 0.27; % lower to reduce swinging in dt  
 Param.dtMin = 1e-15;
 Param.dtMax = 1e-4;
 
@@ -35,7 +36,7 @@ Flag.compAlpha = true;
 Flag.alpha = "exp";         % "const"/"exp"
 Flag.VT = "linear";             % "linear"/"piecewise"
 
-Flag.loadSol = "no";            % "no"/"SaveName"
+Flag.loadSol = "FirstGoodResult";            % "no"/"SaveName"
 Flag.saveSol = "temp";            % "no"/"SaveName"
 
 % Fsolve options
@@ -46,9 +47,10 @@ Opt.FiniteDifferenceType = "forward";   % "central"/"forward"
 
 Opt.MaxIterations = 400;
 Opt.MaxFunctionEvaluations = 40e4;
-% Opt.OptimalityTolerance = 1e-6;
+Opt.OptimalityTolerance = 1e-6;
 Opt.StepTolerance = 1e-6;
 Opt.FunctionTolerance = 1e-6;
+
 
 
 % Takes care of Parameters, Intial condition, and adimensionalization
@@ -65,9 +67,9 @@ Results = postProcess(Dati, ADati, Results, Flag);
 %% Plot
 % Plotting Flags
 
-Flag.concentrationPlot = "all";    % "all"/"last"/"none"
+Flag.concentrationPlot = "none";    % "all"/"last"/"none"
 Flag.potentialPlot = "none";
-Flag.currentPlot = "none";
+Flag.currentPlot = "all";
 
 Flag.generationPlot = "none";
 

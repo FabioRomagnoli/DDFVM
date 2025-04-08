@@ -6,12 +6,18 @@ implemented
 - unified compcurrent (RHS of plasma)
 - saving and loading files
 - dynamic plotting
+-  unification of solvePlasma and solveDiode? worth it?
+- alpha exponential (possibly with linear combination of grad(phi)
+- proper check gradient
 
 missing
-- unification of solvePlasma and solveDiode? worth it?
-- alpha exponential (possibly with linear combination of grad(phi)
 - operator splitting for diodes  (for plasma too)?
-- proper check gradient
+
+
+Ic = 7.33874e-06 Iz = 2.18717e-04, diff = 0.00021138
+beta = 10206714.642
+Saved Solution 
+
 
 
 

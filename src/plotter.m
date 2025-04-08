@@ -1,24 +1,21 @@
-function plotPlasma(Sol, R, D, F)  
+function plotter(R, D, F)  
     % Concentration of each species
-    concentrationPlot(Sol, R, D, F);
+    concentrationPlot(R, D, F);
 
     % Potential V
-    potentialPlot(Sol, R, D, F);
+    potentialPlot(R, D, F);
 
     % Electrical  current J
-    currentPlot(Sol, R, D, F);
+    currentPlot(R, D, F);
 
-    % comparison of rhs generation, prev used for db
-    generationPlot(Sol,R,D,F);
-
-    % comparison of comp current methods, prev used for db
-    compCurrentPlot(Sol,R,D,F)
-
-    
+    if strcmp(F.model,"plasma")
+        % comparison of rhs generation, prev used for db
+        generationPlot(R,D,F);
+    end
 end
 
 
-function concentrationPlot(Sol, R, D, F)
+function concentrationPlot(R, D, F)
     switch F.concentrationPlot
         case "none"
             return
@@ -28,12 +25,16 @@ function concentrationPlot(Sol, R, D, F)
             ks = 1;
     end
     figure;
-    title('Electron and hole concentrations')
     for k=ks:R.kf
-        nk = Sol(D.nIdxs,k);
-        pk = Sol(D.pIdxs,k);
+        vk = R.Sol(D.vIdxs,k);
+        nk = R.Sol(D.nIdxs,k);
+        pk = R.Sol(D.pIdxs,k);
+
+
+
 
         clf; % Clear figure before plotting new data
+        title(['Electron and hole concentrations at V = ', num2str(vk(1))]);
         hold on;
         plot(D.r,pk, 'LineWidth', 1, "DisplayName", "p");
         plot(D.r,nk, 'LineWidth', 1, "DisplayName", "n");
@@ -42,7 +43,7 @@ function concentrationPlot(Sol, R, D, F)
         grid on; 
         legend();
         set(gca, 'YScale', 'log')
-        % set(gca, 'XScale', 'log')
+        set(gca, 'XScale', 'log')
 
         xlabel('Position (m)');           % x-axis label
         ylabel('Concentration (m^{-3})'); % y-axis label
@@ -52,7 +53,7 @@ function concentrationPlot(Sol, R, D, F)
     end
 end
 
-function potentialPlot(Sol, R, D, F)
+function potentialPlot(R, D, F)
     switch F.potentialPlot
         case "none"
             return
@@ -64,8 +65,9 @@ function potentialPlot(Sol, R, D, F)
     figure;
     title('Electric potential')
     for k = ks:R.kf
+
         clf; % Clear figure before plotting new data
-        vk = Sol(D.vIdxs, k);
+        vk = R.Sol(D.vIdxs, k);
         
         plot(D.r, vk, 'LineWidth', 1, "DisplayName", "v");
         
@@ -79,7 +81,7 @@ function potentialPlot(Sol, R, D, F)
     end
 end
     
-function currentPlot(Sol, R, D, F)
+function currentPlot(R, D, F)
     switch F.currentPlot
         case "none"
             return
@@ -92,13 +94,15 @@ function currentPlot(Sol, R, D, F)
     figure;
 
     rhalf = (D.r(1:end-1) + D.r(2:end))/2;
-    title('Current ')
     for k=ks:R.kf
-        vk = Sol(D.vIdxs,k);
-        nk = Sol(D.nIdxs,k);
-        pk = Sol(D.pIdxs,k);
+
+        vk = R.Sol(D.vIdxs,k);
+        nk = R.Sol(D.nIdxs,k);
+        pk = R.Sol(D.pIdxs,k);
+
 
         clf; % Clear figure before plotting new data
+        title(['Current at V = ', num2str(vk(1))]);
 
         Jn = 2*pi*D.q*comp_current(D.r,D.mun,vk,D.Vth,-1,nk);
         Jp = 2*pi*D.q*comp_current(D.r,D.mup,vk,D.Vth, 1,pk);
@@ -119,21 +123,21 @@ function currentPlot(Sol, R, D, F)
     
 end
 
-function generationPlot(Sol, R, D, F)
+function generationPlot(R, D, F)
     if F.generationPlot == "none", return; end
 
-    % With matri
-    Ar = ax_gen(D.r, Sol(D.vIdxs,end), D.mun, D.alpha, D.Vth, -1);
+    % With matrix
+    Ar = ax_gen(D.r, R.Sol(D.vIdxs,end), D.mun, R.alpha, D.Vth, -1);
     
     % generation term
     dr = diff(D.r);
-    Jn = comp_current(D.r,D.mun,Sol(D.vIdxs,end),D.Vth,-1,Sol(D.nIdxs,end));
+    Jn = comp_current(D.r,D.mun,R.Sol(D.vIdxs,end),D.Vth,-1,R.Sol(D.nIdxs,end));
 
     % Alpha term
     if strcmp(F.alpha,"const")
         alphalow = dr/2; alphahigh = dr/2;
     elseif strcmp(F.alpha,"exp")
-        [alphalow, alphahigh] = alpha_exp(D.r, Sol(D.vIdxs,end), D.Ei, R.alpha);
+        [alphalow, alphahigh] = alpha_exp(D.r, R.Sol(D.vIdxs,end), D.Ei, R.beta);
     end
     
     RHS = abs(([0; alphalow.*Jn]+[alphahigh.*Jn; 0]));
@@ -143,11 +147,11 @@ function generationPlot(Sol, R, D, F)
 
     hold on; 
     
-    plot(D.r,RHS,"b-o", 'DisplayName', 'Jn [1/m^2*s]');
+    plot(D.r, RHS,"b-o", 'DisplayName', 'Jn [1/m^2*s]');
 
     plot(D.r, R.genInt, "k-s", 'DisplayName', 'Const Gen');
 
-    plot(D.r, Ar*Sol(D.nIdxs,end),"-*",'DisplayName', 'Matrix' );    
+    plot(D.r, Ar*R.Sol(D.nIdxs,end),"-*",'DisplayName', 'Matrix' );    
     hold off;
 
     grid on;
@@ -157,38 +161,4 @@ function generationPlot(Sol, R, D, F)
     legend('Location', 'best'); 
     ylabel("RHS [1/(ms)]");
 
-
-end
-
-function compCurrentPlot(Sol,R,D,F)
-    if F.compCurrentPlot == "none", return; end
-
-    rhalf = (D.r(1:end-1) + D.r(2:end))/2;
-    dd = [0; diff(D.r)/2] + [diff(D.r)/2; 0];
-    
-    Arn = ax_gen(D.r, Sol(D.vIdxs,end), D.mun, 1, D.Vth, -1);
-    AJn = ((2*pi*D.q)*Arn*Sol(D.nIdxs,end))./dd;
-
-    Arp = ax_gen(D.r, Sol(D.vIdxs,end), D.mup, -1, D.Vth, -1);
-    AJp = ((-2*pi*D.q)*Arp*Sol(D.pIdxs,end))./dd;
-
-   
-    figure()
-    title('Comparison of Current computation')
-
-    hold on; 
-    plot(rhalf,R.Jn,"b-o", 'DisplayName', 'comp_current');
-    plot(D.r,  AJn,"-*",'DisplayName', 'RHS' );    
-
-    plot(rhalf,R.Jp,"b-o", 'DisplayName', 'comp_current');
-    plot(D.r,  AJp,"-*",'DisplayName', 'RHS' );  
-    hold off;
-
-    grid on;
-    set(gca, 'YScale', 'log') % Change y-axis to log scale
-    set(gca, 'XScale', 'log') % Change y-axis to log scale
-    legend('Location', 'best'); 
-
-    % xlim([D.r0 D.r0+D.ionLength]);
-    
 end

@@ -1,7 +1,8 @@
 clear all;
 
 addpath Utils
-addpath diode
+addpath init
+addpath src
 
 % Hyperparameters Diode
 Param = struct();
@@ -9,22 +10,31 @@ Param.K = 100;                   %Time grid points
 Param.lr = 101;
 Param.dt = 1e-10;               % Time separation  [s]
 % Param.T  = 1e-6;
-% Param.V0 = 0.7;                   % Starting voltage (r=1) [V]
+% Param.V0 = 0;                   % Starting voltage (r=1) [V]
 Param.VT = 1.4;                 % Ending voltage (r=end) [V]
 Param.case = 3;
-Param.tol = 1e-3;
+Param.tolError = 1e-3;
 Param.Nverbose = 0;
 
+
+Param.stepBuffer = 0.8;
+Param.scalingPower = 0.3;
+Param.dtMin = 1e-17;
+Param.dtMax = 1e-2;
+
+
 % simulation settings
-Flag.method = "newton";         % "fsolve"/"newton"
+Flag.model = "diode";
+
+Flag.method = "fsolve";         % "fsolve"/"newton"
 Flag.adaptive = true;        
 Flag.CheckGradients = true;
 
 Flag.mesh = "linear";           % "linear"/"tanh"
-Flag.VT = "piecewise";          % "linear"/"piecewise"
+Flag.VT = "linear";          % "linear"/"piecewise"
 
-Flag.saveSol = "no";            % "no"/"SaveName"
 Flag.loadSol = "no";            % "no"/"SaveName"
+Flag.saveSol = "DiodeCase3";            % "no"/"SaveName"
 
 
 % Fsolve flags
@@ -43,15 +53,15 @@ Opt.FunctionTolerance = 1e-6;
 [Param, Dati, ADati] = initDiode(Param, Flag);
 
 % Solve
-ASol = solveDiode(ADati, Flag, Opt);
+ASol = solve(ADati, Flag, Opt);
 
 %% Postprocessing
-[Sol, Res] = postDiode(ADati, Dati, ASol, Flag);
+Results = postProcess(Dati, ADati, ASol, Flag);
 
 %% Plot
 % Plotting Flags
-Flag.concentrationPlot = "last";    % "all"/"last"/"none"
+Flag.concentrationPlot = "none";    % "all"/"last"/"none"
 Flag.potentialPlot = "none";
 Flag.currentPlot = "all";
 
-plotDiode(Sol,Res,Dati,Flag);
+plotter(Results,Dati,Flag);

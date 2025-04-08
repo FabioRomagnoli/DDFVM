@@ -37,6 +37,11 @@ function Param = paramPlasma(Param)
     def.q = 1.6e-19;                   % Charge                    [C] 
     def.Vth = 26e-3;                   % Thermal voltage           [V]
     
+
+    % Plasma related constants
+    def.beta = 7.2e5;         % impact ionization coefficient                    [m]/([s][V])
+    def.Ei = 2.09e7;  
+
     % Mesh
     def.r0 = 700e-6;
     def.r1 = def.r0 + 10.35e-2;
@@ -52,9 +57,6 @@ function Param = paramPlasma(Param)
     def.dtMin = 1e-8;
     def.dtMax = 1;
 
-    % Plasma related constants
-    def.beta = 7.2e5;         % impact ionization coefficient                    [m]/([s][V])
-    def.Ei = 2.09e7;  
 
     % Get field names from the default struct
     defaultFields = fieldnames(def);
@@ -74,7 +76,8 @@ function Dati = datiPlasma(Param, Flag)
     alpha_msh  = -0.1;
     msh = CreateTanhMsh(Dati.lr, Dati.r0, Dati.r1 - Dati.r0, delta, alpha_msh);
     Dati.r = msh.x;
-    
+    Dati.lrr = Dati.lr - 2;
+
     % Vector
     Dati.S = Param.S*ones(Dati.lr-2,1);   
     

@@ -20,13 +20,15 @@ function Param = paramDiode(Param)
     def.VT = 1.4;                     % Ending voltage (r=end) [V]
     def.N = 10^22;                    % density constant [m-3]
     def.case = 3;
-    def.tol = 1e-3;
+    def.tolError = 1e-3;
 
     % PHYSICAL PARAMETERS 
     def.ni = 6.14e+15;                    % Intrinsic concentration
     def.eps = 1.035e-10;               % Permittivity              [C]/([V][m])
     def.q = 1.6e-19;                   % Charge                    [C] 
     def.mu = 0.1;                    % Diffusivity coefficients  [m2]/([s][V])
+    def.mun = def.mu;
+    def.mup = def.mu;
     def.Vth = 26e-3;   
     def.tau = 1e-11;
 
@@ -38,6 +40,13 @@ function Param = paramDiode(Param)
     def.Nmaxit = 150; 
     def.Ntoll = 1e-5;
     def.Nverbose = 1;
+
+
+    % Adaptive time step parameters
+    def.stepBuffer = 0.9;
+    def.scalingPower = 0.5;
+    def.dtMin = 1e-8;
+    def.dtMax = 1;
 
     % Get default values into Param
     defaultFields = fieldnames(def);
@@ -62,6 +71,7 @@ function Dati = datiDiode(Param, Flag)
         msh = CreateTanhMsh(Dati.lr, Dati.r0, Dati.r1 - Dati.r0, delta, alpha_msh);
         Dati.r = msh.x;
     end
+    Dati.lrr = Dati.lr - 2;
 
     % Vector
     Dati.N = Param.N*ones(size(Dati.r));        % N density of the gas      [m-3]
@@ -136,15 +146,7 @@ end
 
 
 function AD = adimDiode(D, Flag)
-    % non dimensional quantities
-    AD.lr = D.lr;
-    AD.K = D.K;
-    AD.tol = D.tol;
-    
-    % Newton Parameters
-    AD.Nmaxit = D.Nmaxit; 
-    AD.Ntoll = D.Ntoll;
-    AD.Nverbose = D.Nverbose;
+    AD = D;
 
     % Scaling factors
     AD.xbar = D.r1 - D.r0;                    % Lenght of device [m]
@@ -154,7 +156,11 @@ function AD = adimDiode(D, Flag)
     AD.mubar= AD.tbar*AD.Vbar/AD.xbar^2;               % [m2]/([s][V])
     AD.qbar = D.q;
     
-    % Scaling procedure
+
+    % Adaptive time step parameters 
+    AD.dtMin = D.dtMin/AD.tbar;
+    AD.dtMax = D.dtMax/AD.tbar;
+
     % mesh
     AD.r1 = D.r1/AD.xbar; 
     AD.r0 = D.r0/AD.xbar;
@@ -173,7 +179,8 @@ function AD = adimDiode(D, Flag)
     AD.eps = D.eps*AD.Vbar/(D.q*AD.nbar*AD.xbar^2);     % adimensionale (squared normalized D. L.)
     AD.ni = D.ni/AD.nbar;
     AD.mu = D.mu*AD.mubar; 
-
+    AD.mun =  D.mun*AD.mubar;
+    AD.mup = AD.mup*AD.mubar;
     % simulation parameters 
     AD.V0 = D.V0/AD.Vbar;
     AD.VT = D.VT/AD.Vbar;
@@ -196,13 +203,4 @@ function AD = adimDiode(D, Flag)
     AD.p0 = D.p0/AD.nbar;
     AD.x0 = [AD.v0; AD.n0; AD.p0];
 
-    % full vector indices
-    AD.vIdxs = D.vIdxs;
-    AD.nIdxs = D.nIdxs;
-    AD.pIdxs = D.pIdxs;
-
-    %  reduced indices
-    AD.vIR = D.vIR;
-    AD.nIR = D.nIR;
-    AD.pIR = D.pIR;
 end
