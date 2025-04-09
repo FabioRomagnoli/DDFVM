@@ -54,7 +54,7 @@ function Param = paramPlasma(Param)
     % Adaptive time step parameters
     def.stepBuffer = 0.9;
     def.scalingPower = 0.5;
-    def.dtMin = 1e-8;
+    def.dtMin = 1e-15;
     def.dtMax = 1;
 
 
@@ -106,6 +106,10 @@ function Dati = datiPlasma(Param, Flag)
     Dati.nIR  = lrr + 1 : 2*lrr;
     Dati.pIR  = 2*lrr + 1 : 3*lrr;
 
+    % indexes for interior and boundary elements of full vector x 
+    Dati.intIdxs = [2:AD.lr-1, AD.lr+2:2*AD.lr-1, 2*AD.lr+2:3*AD.lr-1];
+    Dati.bcsIdxs = [1, AD.lr,  AD.lr+1,  2*AD.lr, 2*AD.lr+1,  3*AD.lr];
+
     if strcmp(Flag.VT, "linear")
         % linear increase from V0 to VT
         Dati.Vt = @(t) Dati.V0 + (Dati.VT - Dati.V0)/Dati.T*t;
@@ -114,7 +118,11 @@ function Dati = datiPlasma(Param, Flag)
         Dati.Vt = @(t) (t <= Dati.T/100) * Dati.V0 + ...
                        (Dati.T/100 < t && t <= Dati.T-Dati.T/100) * (Dati.V0 + (Dati.VT - Dati.V0)/(Dati.T*0.98)*t) + ...
                        (Dati.T-Dati.T/100 < t )  * Dati.VT;
+    elseif strcmp(Flag.VT, "plateu")
+        Dati.Vt = @(t)  (t <= Dati.T-Dati.T/100) * (Dati.V0 + (Dati.VT - Dati.V0)/(Dati.T*0.99)*t) + ...
+                        (Dati.T-Dati.T/100 < t )  * Dati.VT;
     end
+
 
     Dati.tsave = linspace(0, Dati.T, Dati.K+1);
 
@@ -185,6 +193,9 @@ function AD = adimPlasma(D, Flag)
         AD.Vt = @(t) (t <= AD.T/100) * AD.V0 + ...
                    (AD.T/100 < t && t <= AD.T-AD.T/100) * (AD.V0 + (AD.VT - AD.V0)/(AD.T*0.98)*t) + ...
                    (AD.T-AD.T/100 < t )  * AD.VT;
+    elseif strcmp(Flag.VT, "plateu")
+        AD.Vt = @(t)  (t <= AD.T-AD.T/100) * (AD.V0 + (AD.VT - AD.V0)/(AD.T*0.99)*t) + ...
+                        (AD.T-AD.T/100 < t )  * AD.VT;
     end
 
     % vectors

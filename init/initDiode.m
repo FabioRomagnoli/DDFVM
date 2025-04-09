@@ -130,6 +130,11 @@ function Dati = datiDiode(Param, Flag)
     Dati.nIR  = lrr + 1 : 2*lrr;
     Dati.pIR  = 2*lrr + 1 : 3*lrr;
 
+
+    % indexes for interior and boundary elements of full vector x 
+    Dati.intIdxs = [2:AD.lr-1, AD.lr+2:2*AD.lr-1, 2*AD.lr+2:3*AD.lr-1];
+    Dati.bcsIdxs = [1, AD.lr,  AD.lr+1,  2*AD.lr, 2*AD.lr+1,  3*AD.lr];
+
     if strcmp(Flag.VT, "linear")
         % linear increase from V0 to VT
         Dati.Vt = @(t) Dati.V0 + (Dati.VT - Dati.V0)/Dati.T*t;
