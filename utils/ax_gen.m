@@ -1,10 +1,6 @@
-function Ar = ax_gen(r, v, mu, alpha, Vth, z)
-
+function Ar = ax_gen(r, mu, alpha, Vth, z, Bp, Bn)
     lr = length(r);
     dr = diff(r);
-
-    DV = z .* diff (v) / Vth;
-    [Bp, Bn] = bimu_bernoulli (DV);
 
     % Spdiags scarta primo elem sopradiag e ultimo sottodiag
     ld = [-dr/2.*Bp./log(r(1:end-1)./r(2:end)); 0];

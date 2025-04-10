@@ -51,7 +51,7 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
         % + dt
         [xNew, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt);
         if Flag.verbose, solverOutput("1) dt", info); end
-        if info.exitflag == 0, dt= dt*0.75; fprintf("\t Halving dt\n\n"); continue; end
+        if info.exitflag == 0, dt= dt*0.75; fprintf("\t Reducing dt\n\n"); continue; end
 
         if Flag.adaptive
             % + dt/2
@@ -125,7 +125,6 @@ function  solverOutput(step,info)
                 fprintf("Solved, EF=%d", info.exitflag)
             case 0
                 fprintf("Failed, EF=%d", info.exitflag)
-
                 % fprintf("Number of iterations exceeded or number of function evaluations exceeded.\n");
                 % disp(info.output.message);
             case -1

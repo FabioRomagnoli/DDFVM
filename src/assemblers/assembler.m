@@ -1,19 +1,3 @@
-% function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
-%     % if strcmp(Flag.scheme, "coupled")
-%         [F,jac] = coupled(x, x0, BCs,  AD, Flag, t, dt);
-%     % 
-%     % elseif strcmp(Flag.scheme, "split")
-%     %     if strcmp(Flag.operator,"transport")
-%     %         [F,jac] = % impicit step
-%     % 
-%     %     elseif strcmp(Flag.operator,"reaction")
-%     %         [F,jac] = % explicit step
-%     %     end
-%     % end
-% end
-
-data = {r, mun, mup, Vth, Mf, Af, }
-
 function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
     % get boundary
     v_bc = BCs(1:2);

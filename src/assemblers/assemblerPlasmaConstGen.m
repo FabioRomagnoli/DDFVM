@@ -1,4 +1,4 @@
-function [F,jac] = assemblerDiode(x, x0, BCs,  AD, dt)
+function [F,jac] = assemblerPlasmaConstGen(x, x0, BCs,  AD, dt)
     % Unpack
     M = AD.M;
     A = AD.A;
@@ -10,12 +10,12 @@ function [F,jac] = assemblerDiode(x, x0, BCs,  AD, dt)
     n_bc = BCs(3:4);
     p_bc = BCs(5:6);
 
-
     % Extract vectors
     v = [v_bc(1); x(1:lrr); v_bc(2)];
     n = [n_bc(1); x(lrr+1:2*lrr); n_bc(2)];
     p = [p_bc(1); x(2*lrr+1:end); p_bc(2)];
     
+
     % Compute bimu bernulli only once
     DV =  diff(v) / AD.Vth;
     [Bp, Bn] = bimu_bernoulli (DV);
@@ -45,22 +45,21 @@ function [F,jac] = assemblerDiode(x, x0, BCs,  AD, dt)
     % system elements
     bounds = [A_bc*v_bc; dt*An_bc*n_bc; dt*Ap_bc*p_bc];
 
-    rhs = [M*AD.N(2:end-1); M*n0; M*p0];
+    rhs = [zeros(lrr,1);  M*n0  ; M*p0];
 
-    R =  (AD.ni^2 - n(2:end-1).*p(2:end-1))./(AD.tau*(n(2:end-1)+p(2:end-1)));
-    gen = [zeros(lrr,1); dt*M*R; dt*M*R];
-
+    gen = [zeros(lrr,1); dt*M*AD.gen(2:end-1) ; dt*M*AD.gen(2:end-1) ];
+    
+    
     % Build system
     F = NL*x - gen + bounds - rhs;
 
     % JACOBIAN 
     if nargout>1
         zeri = zeros(lrr);
-
+        
         dAn = zeros(AD.lr, AD.lr);    
         dAp = zeros(AD.lr, AD.lr);    
     
-       
         % derivatives in dv
         for i=2:AD.lr-1
             log_pos = 1/log(AD.r(i)/AD.r(i+1));
@@ -82,30 +81,24 @@ function [F,jac] = assemblerDiode(x, x0, BCs,  AD, dt)
             dAp(i,i) = log_pos * (p(i+1)*DB(-up_neg) + p(i)*DB(-up_pos)) +...
                             log_neg * (p(i)*DB(-dw_neg) + p(i-1)*DB(-dw_pos));
             dAp(i,i+1) = log_pos * (-p(i+1) * DB(-up_neg) - p(i)*DB(-up_pos));
+       
+    
         end
-    
-        dR_dn=@(n,p) -(p.^2 + AD.ni^2)./(AD.tau*((n+p).^2));
-        dR_dp=@(n,p) -(n.^2 + AD.ni^2)./(AD.tau*((n+p).^2));
-    
-        dRn = diag(dt*M*dR_dn(n(2:end-1),p(2:end-1)));  
-        dRp = diag(dt*M*dR_dp(n(2:end-1),p(2:end-1))); 
     
         J11 = A;
         J12 = M;
         J13 = -M;
     
         J21 = dt*AD.mun*dAn(2:end-1, 2:end-1);
-        J22 = M + dt*An - dRn;
-        J23 = zeri - dRp;
+        J22 = M + dt*An;
+        J23 = zeri;
     
         J31 = dt*AD.mup*dAp(2:end-1, 2:end-1); 
-        J32 = zeri - dRn;
-        J33 = M + dt*Ap - dRp;
-    
+        J32 = zeri;
+        J33 = M + dt*Ap;
     
         jac = [J11, J12, J13;
                J21, J22, J23;
-               J31, J32, J33];
+               J31, J32, J33];    
     end
-
 end
