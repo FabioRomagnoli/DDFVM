@@ -12,8 +12,6 @@
 %     % end
 % end
 
-data = {r, mun, mup, Vth, Mf, Af, }
-
 function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
     % get boundary
     v_bc = BCs(1:2);
