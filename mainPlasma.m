@@ -25,7 +25,6 @@ Param.dtMin = 1e-15;
 Param.dtMax = 1e-2;
 
 
-
 % Simulation settings
 Flag.model = "plasma";
 Flag.scheme = "coupled";
@@ -74,14 +73,14 @@ diary(logFile);     % Start recording to file
 diary on;
 
 tic;
-try
+% try
     Results.ASol = solve(ADati, Flag, Opt);
-catch ME
-    disp(ME)
-    fprintf('ERROR: %s\n', ME.message);
-    diary off;
-    return
-end
+% catch ME
+%     disp(ME)
+%     fprintf('ERROR: %s\n', ME.message);
+%     diary off;
+%     return
+% end
 
 Results.elapsedTime = toc;
 

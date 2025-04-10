@@ -2,8 +2,8 @@ function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
 % handles the coupled or splitting scheme
     if strcmp(Flag.scheme, "coupled")
         BCs(1) = AD.Vt(t+dt);
-        fun = @(x) assembler(x, xPrev, BCs,  AD, dt);
-        
+        fun = @(x) assembler(x, xPrev, BCs,  AD,Flag, dt);
+
         % Check gradient 
         if Flag.CheckGradients 
             [isValid, diffMatrix] = checkJacobian(fun, xPrev, 1e-3);

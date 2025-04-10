@@ -206,9 +206,11 @@ function AD = adimPlasma(D, Flag)
     
     % Matrices
     AD.M_full = ax_mass(AD.r, 1);
-    AD.A_full = ax_laplacian(AD.r,AD.eps);
     AD.M = AD.M_full(2:end-1,2:end-1);
+    AD.A_full = ax_laplacian(AD.r,AD.eps);
     AD.A = AD.A_full(2:end-1,2:end-1);
+    AD.A_bc = AD.A_full(2:end-1,[1 end]);
+
 
 end
 
