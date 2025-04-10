@@ -1,18 +1,4 @@
-% function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
-%     % if strcmp(Flag.scheme, "coupled")
-%         [F,jac] = coupled(x, x0, BCs,  AD, Flag, t, dt);
-%     % 
-%     % elseif strcmp(Flag.scheme, "split")
-%     %     if strcmp(Flag.operator,"transport")
-%     %         [F,jac] = % impicit step
-%     % 
-%     %     elseif strcmp(Flag.operator,"reaction")
-%     %         [F,jac] = % explicit step
-%     %     end
-%     % end
-% end
-
-function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
+function [F,jac] = assembler(x, x0, BCs,  AD, Flag, dt)
     % get boundary
     v_bc = BCs(1:2);
     n_bc = BCs(3:4);
@@ -23,7 +9,6 @@ function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
     n = [n_bc(1); x(AD.lrr+1:2*AD.lrr); n_bc(2)];
     p = [p_bc(1); x(2*AD.lrr+1:end); p_bc(2)];
     
-
     % Matrix definitions
     An_full = ax_dd(AD.r, v, AD.mun, AD.Vth, -1);
     Ap_full = ax_dd(AD.r, v, AD.mup, AD.Vth, 1); 
