@@ -44,7 +44,7 @@ Flag.saveSol = "DiodeCase3";            % "no"/"SaveName"
 % Fsolve flags
 Opt = optimoptions('fsolve'); 
 Opt.Display = "none";                   % "off"/"iter"/"final"/"final-detailed"     
-Opt.SpecifyObjectiveGradient = true;    % Jacobian or no Jacobian
+Opt.SpecifyObjectiveGradient = false;    % Jacobian or no Jacobian
 Opt.Algorithm = "trust-region-dogleg";  % trust-region-dogleg
 Opt.FiniteDifferenceType = "forward";   % "central"/"forward"
 % Opt.MaxIterations = 400;
