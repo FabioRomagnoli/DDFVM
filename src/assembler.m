@@ -12,21 +12,20 @@
 %     % end
 % end
 
-
+data = {r, mun, mup, Vth, Mf, Af, }
 
 function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
     % get boundary
     v_bc = BCs(1:2);
-    v_bc(1) = AD.Vt(t+dt);
     n_bc = BCs(3:4);
     p_bc = BCs(5:6);
-
 
     % Extract vectors
     v = [v_bc(1); x(1:AD.lrr); v_bc(2)];
     n = [n_bc(1); x(AD.lrr+1:2*AD.lrr); n_bc(2)];
     p = [p_bc(1); x(2*AD.lrr+1:end); p_bc(2)];
     
+
     % Matrix definitions
     An_full = ax_dd(AD.r, v, AD.mun, AD.Vth, -1);
     Ap_full = ax_dd(AD.r, v, AD.mup, AD.Vth, 1); 
@@ -67,7 +66,7 @@ function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
 
     % JACOBIAN 
     if nargout>1
-        jac = jacobian(v, n, p, AD, Flag,dt, A, M, An, Ap);
+        jac = jacobian(v, n, p, AD, Flag, dt, A, M, An, Ap);
     end
 end
 

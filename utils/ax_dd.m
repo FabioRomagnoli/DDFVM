@@ -1,19 +1,16 @@
-function F = ax_dd (r, v, mu, Vth, z)
+function F = ax_dd (r, mu, Vth, Bp, Bn)
 
   ndof = numel (r);
   %h    = diff (r);
-  
-  DV = z .* diff(v) / Vth;
-  [Bp, Bm] = bimu_bernoulli (DV);
 
-  fll = - mu * Vth .* Bp ./ (log(r(1:end-1) ./ r(2:end)));
-  fld =   mu * Vth .* Bm ./ (log(r(1:end-1) ./ r(2:end)));
-  fru =   mu * Vth .* Bm ./ (log(r(1:end-1) ./ r(2:end)));
-  frd = - mu * Vth .* Bp ./ (log(r(1:end-1) ./ r(2:end)));
+  logTerm = (log(r(1:end-1) ./ r(2:end)));
+
+  fll = - mu * Vth .* Bp ./ logTerm;
+  fld =   mu * Vth .* Bn ./ logTerm;
 
 
-  dd = [frd; 0] - [0; fld];
-  du = [0; fru];
+  dd = [fll; 0] - [0; fld];
+  du = [0; fld];
   dl = [-fll; 0];
   F = spdiags([dl, dd, du], -1:1, ndof, ndof);
   

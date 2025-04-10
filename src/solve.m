@@ -10,16 +10,6 @@ function [solution] = solve(AD, Flag, Opt)
         x0 = AD.x0;       % x0 serves as the prev time step and as inital guess
     end
  
-    % Check gradient 
-    if Flag.CheckGradients 
-        funJac = @(x) assembler(x, x0(AD.intIdxs), x0(AD.bcsIdxs),  AD, Flag, t, dt);
-        [isValid, diffMatrix] = checkJacobian(funJac, x0(AD.intIdxs), 1e-3);
-        % isValid = checkGradients(fun,x0r,optimoptions("fmincon",FiniteDifferenceType="central"),"Display","on");
-        if ~isValid
-            % disp(diffMatrix)
-            error("Failed check gradient\n"); 
-        end
-    end
 
     solution(:,1) = x0;    % saves first solution ie x0 
     % actual computation of solution
@@ -101,8 +91,6 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
         end
     end
 end
-
-
 
 
 

@@ -206,5 +206,13 @@ function AD = adimDiode(D, Flag)
     AD.n0 = D.n0/AD.nbar;
     AD.p0 = D.p0/AD.nbar;
     AD.x0 = [AD.v0; AD.n0; AD.p0];
+    
+    % Matrices
+    AD.M_full = ax_mass(AD.r, 1);
+    AD.M = AD.M_full(2:end-1,2:end-1);
+    AD.A_full = ax_laplacian(AD.r,AD.eps);
+    AD.A = AD.A_full(2:end-1,2:end-1);
+    AD.A_bc = AD.A_full(2:end-1,[1 end]);
+
 
 end

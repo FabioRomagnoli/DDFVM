@@ -3,8 +3,10 @@ function J = comp_current(r,mu,v,Vth,z,n)
   % hence it is of size lr-1
   % can be used to compute the total current 
   % or be integratted with the constant piecewise method
-  DV = z .* diff(v) / Vth;
+
+  DV = z*diff(v) / Vth;
   [Bp, Bn] = bimu_bernoulli (DV);
+
   nBn = n(2:end).*Bn;
   nBp = n(1:end-1).*Bp;
 

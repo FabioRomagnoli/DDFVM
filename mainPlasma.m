@@ -47,9 +47,9 @@ Flag.saveSol = "temp";              % "no"/"SaveName"
 
 % Newton solver Parameters
 
-Opt = optimoptions('fsolve'); 
 
 % Fsolve options
+Opt = optimoptions('fsolve'); 
 Opt.Display = "off";                        % "off"/"iter"/"final"/"final-detailed"
 Opt.SpecifyObjectiveGradient = false; 
 Opt.FiniteDifferenceType = "forward";       % "central"/"forward"
