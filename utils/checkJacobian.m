@@ -1,55 +1,55 @@
+% function [isValid, diffMatrix, relDiffMatrix] = checkJacobian(fun, x, tol)
+%     [Jfd,err] = jacobianest(fun,x);
+%     [F0, Janalytic] = fun(x);
+% 
+%     % If the analytic Jacobian is sparse, convert to full
+%     if issparse(Janalytic) , Janalytic = full(Janalytic);  end
+% 
+%     % Print the number of nonzero entries in the analytic Jacobian
+%     numNonZeroAnalytic = nnz(Janalytic);
+%     fprintf('[checkJacobianTermByTerm] Nonzero entries in analytic Jacobian: %d\n', numNonZeroAnalytic);
+%     % Print the number of nonzero entries in the FD Jacobian
+%     fprintf('[checkJacobianTermByTerm] Nonzero entries in FD Jacobian: %d\n', nnz(Jfd));
+% 
+%     % Define an absolute threshold below which differences are considered machine noise.
+%     absTol = 1e-10;
+% 
+%     % Compute the absolute difference between analytic and FD Jacobians
+%     diffMatrix = Janalytic - Jfd;
+% 
+%     % Zero out differences that are smaller than absTol
+%     diffMatrix(abs(diffMatrix) < absTol) = 0;
+% 
+%     % Compute relative differences elementwise.
+%     % Adding eps in the denominator avoids division by zero.
+%     relDiffMatrix = abs(diffMatrix) ./ (max(abs(Janalytic), abs(Jfd)) + eps);
+% 
+%     % Find entries where the relative difference exceeds the tolerance
+%     [rowIdx, colIdx] = find(relDiffMatrix > tol);
+% 
+%     if isempty(rowIdx)
+%         isValid = true;
+%         fprintf('[checkJacobianTermByTerm] All Jacobian entries match within relative tol = %.2e.\n', tol);
+%     else
+%         isValid = false;
+%         fprintf('[checkJacobianTermByTerm] Mismatch in %d entries (relative tol = %.2e):\n', numel(rowIdx), tol);
+%         % Use fixed width formatting for neat columns.
+%         header = sprintf('%-8s %-8s %-22s %-22s %-22s %-22s\n', 'Row', 'Col', 'Analytic', 'FD', 'Abs Diff', 'Rel Diff');
+%         fprintf('%s', header);
+%         for k = 1:numel(rowIdx)
+%             r = rowIdx(k);
+%             c = colIdx(k);
+%             anaVal = Janalytic(r, c);
+%             fdVal  = Jfd(r, c);
+%             absDiff = anaVal - fdVal;
+%             relDiff = relDiffMatrix(r, c);
+%             fprintf('%-8d %-8d %-22.6e %-22.6e %-22.6e %-22.6e\n', r, c, anaVal, fdVal, absDiff, relDiff);
+%         end
+%         fprintf('Consider lowering tol or re-checking your derivative implementation.\n');
+%     end
+% end
+
 function [isValid, diffMatrix, relDiffMatrix] = checkJacobian(fun, x, tol)
-    [Jfd,err] = jacobianest(fun,x);
-    [F0, Janalytic] = fun(x);
-
-    % If the analytic Jacobian is sparse, convert to full
-    if issparse(Janalytic) , Janalytic = full(Janalytic);  end
-    
-    % Print the number of nonzero entries in the analytic Jacobian
-    numNonZeroAnalytic = nnz(Janalytic);
-    fprintf('[checkJacobianTermByTerm] Nonzero entries in analytic Jacobian: %d\n', numNonZeroAnalytic);
-    % Print the number of nonzero entries in the FD Jacobian
-    fprintf('[checkJacobianTermByTerm] Nonzero entries in FD Jacobian: %d\n', nnz(Jfd));
-
-    % Define an absolute threshold below which differences are considered machine noise.
-    absTol = 1e-10;
-
-    % Compute the absolute difference between analytic and FD Jacobians
-    diffMatrix = Janalytic - Jfd;
-    
-    % Zero out differences that are smaller than absTol
-    diffMatrix(abs(diffMatrix) < absTol) = 0;
-
-    % Compute relative differences elementwise.
-    % Adding eps in the denominator avoids division by zero.
-    relDiffMatrix = abs(diffMatrix) ./ (max(abs(Janalytic), abs(Jfd)) + eps);
-
-    % Find entries where the relative difference exceeds the tolerance
-    [rowIdx, colIdx] = find(relDiffMatrix > tol);
-
-    if isempty(rowIdx)
-        isValid = true;
-        fprintf('[checkJacobianTermByTerm] All Jacobian entries match within relative tol = %.2e.\n', tol);
-    else
-        isValid = false;
-        fprintf('[checkJacobianTermByTerm] Mismatch in %d entries (relative tol = %.2e):\n', numel(rowIdx), tol);
-        % Use fixed width formatting for neat columns.
-        header = sprintf('%-8s %-8s %-22s %-22s %-22s %-22s\n', 'Row', 'Col', 'Analytic', 'FD', 'Abs Diff', 'Rel Diff');
-        fprintf('%s', header);
-        for k = 1:numel(rowIdx)
-            r = rowIdx(k);
-            c = colIdx(k);
-            anaVal = Janalytic(r, c);
-            fdVal  = Jfd(r, c);
-            absDiff = anaVal - fdVal;
-            relDiff = relDiffMatrix(r, c);
-            fprintf('%-8d %-8d %-22.6e %-22.6e %-22.6e %-22.6e\n', r, c, anaVal, fdVal, absDiff, relDiff);
-        end
-        fprintf('Consider lowering tol or re-checking your derivative implementation.\n');
-    end
-end
-
-function [isValid, diffMatrix, relDiffMatrix] = checkJacobianTermByTerm(fun, x, tol)
 % CHECKJACOBIANTERMBYTERM
 %   Compares each entry of the analytic Jacobian to a central finite-difference
 %   approximation and checks the relative differences.

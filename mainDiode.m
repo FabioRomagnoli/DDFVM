@@ -3,6 +3,7 @@ clear all;
 addpath Utils
 addpath init
 addpath src
+addpath src\assemblers\
 
 % Hyperparameters Diode
 Param = struct();
@@ -14,7 +15,6 @@ Param.dt = 1e-14;               % Time separation  [s]
 Param.VT = 1.4;                 % Ending voltage (r=end) [V]
 Param.case = 3;
 Param.tolError = 1e-3;
-Param.Nverbose = 0;
 
 
 Param.stepBuffer = 0.8;
@@ -58,14 +58,14 @@ Opt.FunctionTolerance = 1e-6;
 [Param, Dati, ADati] = initDiode(Param, Flag);
 
 % Solve
-ASol = solve(ADati, Flag, Opt);
-% 
+Results.ASol = solve(ADati, Flag, Opt);
+
 % %% Postprocessing
-% Results = postProcess(Dati, ADati, ASol, Flag);
+% Results = postProcess(Dati, ADati, Results, Flag);
 % 
 % %% Plot
 % % Plotting Flags
-% Flag.concentrationPlot = "none";    % "all"/"last"/"none"
+% Flag.concentrationPlot = "all";    % "all"/"last"/"none"
 % Flag.potentialPlot = "none";
 % Flag.currentPlot = "all";
 % 
