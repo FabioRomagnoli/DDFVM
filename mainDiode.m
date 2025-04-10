@@ -25,10 +25,11 @@ Param.dtMax = 1e-2;
 
 % simulation settings
 Flag.model = "diode";
+Flag.scheme = "coupled";
 
 Flag.method = "fsolve";         % "fsolve"/"newton"
 Flag.adaptive = true;        
-Flag.CheckGradients = true;
+Flag.CheckGradients = false;
 
 Flag.mesh = "linear";           % "linear"/"tanh"
 Flag.VT = "linear";          % "linear"/"piecewise"

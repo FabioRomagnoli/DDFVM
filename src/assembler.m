@@ -1,9 +1,26 @@
-function [F,jac]=assembler(x, x0, BCs,  AD, Flag, t, dt)
+% function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
+%     % if strcmp(Flag.scheme, "coupled")
+%         [F,jac] = coupled(x, x0, BCs,  AD, Flag, t, dt);
+%     % 
+%     % elseif strcmp(Flag.scheme, "split")
+%     %     if strcmp(Flag.operator,"transport")
+%     %         [F,jac] = % impicit step
+%     % 
+%     %     elseif strcmp(Flag.operator,"reaction")
+%     %         [F,jac] = % explicit step
+%     %     end
+%     % end
+% end
+
+
+
+function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
     % get boundary
     v_bc = BCs(1:2);
     v_bc(1) = AD.Vt(t+dt);
     n_bc = BCs(3:4);
     p_bc = BCs(5:6);
+
 
     % Extract vectors
     v = [v_bc(1); x(1:AD.lrr); v_bc(2)];
@@ -14,7 +31,7 @@ function [F,jac]=assembler(x, x0, BCs,  AD, Flag, t, dt)
     A_full =  ax_laplacian(AD.r,AD.eps);
     M_full =  ax_mass(AD.r, 1);
     An_full = ax_dd(AD.r, v, AD.mun, AD.Vth, -1);
-    Ap_full = ax_dd(AD.r, v, AD.mup, AD.Vth, 1); % Così il numero di valenza è corretto
+    Ap_full = ax_dd(AD.r, v, AD.mup, AD.Vth, 1); 
    
     % Get reduced matrix
     A = A_full(2:end-1,2:end-1);
@@ -27,7 +44,6 @@ function [F,jac]=assembler(x, x0, BCs,  AD, Flag, t, dt)
     An_bc = An_full(2:end-1,[1 end]);
     Ap_bc = Ap_full(2:end-1,[1 end]);
     
-
     % Full matrix construction
     zeri = zeros(AD.lrr);
     NL = [A M -M; 
@@ -37,7 +53,6 @@ function [F,jac]=assembler(x, x0, BCs,  AD, Flag, t, dt)
     % previous time step (no bounds)
     n0 = x0(AD.lrr+1:2*AD.lrr);
     p0 = x0(2*AD.lrr+1:end);
-
 
     % system elements
     bounds = [A_bc*v_bc; dt*An_bc*n_bc; dt*Ap_bc*p_bc];
@@ -54,13 +69,11 @@ function [F,jac]=assembler(x, x0, BCs,  AD, Flag, t, dt)
     % Build system
     F = NL*x - gen + bounds - rhs;
 
-    
     % JACOBIAN 
     if nargout>1
         jac = jacobian(v, n, p, AD, Flag,dt, A, M, An, Ap);
     end
 end
-
 
 
 
@@ -101,6 +114,7 @@ function jac = jacobian(v, n, p, AD, Flag, dt,  A, M, An, Ap)
     dAp = zeros(AD.lr, AD.lr);    
     dAr = zeros(AD.lr, AD.lr);    
 
+    % derivatives in dv
     for i=2:AD.lr-1
         log_pos = 1/log(AD.r(i)/AD.r(i+1));
         log_neg = 1/log(AD.r(i-1)/AD.r(i));

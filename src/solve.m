@@ -1,6 +1,4 @@
 function [solution] = solve(AD, Flag, Opt)
-    options = set_options(Opt);
-    t = 0;
     dt = AD.dt;
 
     % Load solution as starting point 
@@ -30,7 +28,7 @@ function [solution] = solve(AD, Flag, Opt)
         x0 = solution(:,it-1);
         t = AD.tsave(it-1);
         t1 = AD.tsave(it);
-        [x1, dt] = timeSteppingLoop(AD, Flag, options, x0, t, t1, dt);
+        [x1, dt] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt);
         if ~Flag.adaptive, dt = AD.dt; end
 
         % save solution
@@ -41,7 +39,7 @@ function [solution] = solve(AD, Flag, Opt)
 end
 
 
-function [x0, dtBest] = timeSteppingLoop(AD, Flag, options, x0, t, t1, dt)
+function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
 
     while t < t1 - 1e-12
         % to stop execution create a file "STOP_NOW.txt" in DDFVM folder
@@ -57,32 +55,27 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, options, x0, t, t1, dt)
             dt = t1 - t;
         end
 
-        x0r = x0(AD.intIdxs);    % reduced vector, solve  w/out BCs
+        x0r = x0(AD.intIdxs);        % reduced vector, solve  w/out BCs
         BCs =  x0(AD.bcsIdxs);       % BCs go in known RHS
 
         % + dt
-        fun = @(x) assembler(x, x0r, BCs,  AD, Flag, t, dt);
-        [xNew, info] = solver(fun, x0r, options, Flag, AD);
+        [xNew, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt);
         if Flag.verbose, solverOutput("1) dt", info); end
         if info.exitflag == 0, dt= dt*0.75; fprintf("\t Halving dt\n\n"); continue; end
 
-
         if Flag.adaptive
             % + dt/2
-            funhalf = @(x) assembler(x, x0r, BCs,  AD, Flag, t, dt/2);
-            [xTemp, info] = solver(funhalf, x0r, options, Flag, AD);
+            [xTemp, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt/2);
             if Flag.verbose, solverOutput("\t 2) dt/2", info); end
             if info.exitflag <= 0, return; end
 
              % + dt/2
-            funhalf = @(x) assembler(x,xTemp, BCs,  AD, Flag, t+dt/2, dt/2);
-            [xTemp, ~] = solver(funhalf, xTemp, options, Flag, AD);
+            [xTemp, info] = scheme(xTemp, BCs, AD, Flag, Opt, t+dt/2, dt/2);
             if Flag.verbose, solverOutput("\t 3) dt/2", info); end
             if info.exitflag <= 0, return; end
     
-            relativeError = computeRelErrors(xNew, xTemp, AD, Flag.verbose);
-            timeScaling = AD.stepBuffer * (AD.tolError / relativeError)^AD.scalingPower;
-            timeScaling = max(0.5, min(1.3, timeScaling));
+            relativeError = computeRelErrors(xNew, xTemp, AD, Flag);
+            timeScaling = max(0.5, min(1.3, AD.stepBuffer * (AD.tolError / relativeError)^AD.scalingPower));
             if Flag.verbose, fprintf('  t =%12.4e \t  dt =%12.4e, \t Vt = %12.6e \t scale = %g\n', t*AD.tbar, dt*AD.tbar, AD.Vt(t+dt)*AD.Vbar, timeScaling); end
             dtNew = dt * timeScaling;
             if relativeError < AD.tolError
@@ -110,41 +103,8 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, options, x0, t, t1, dt)
 end
 
 
-function [xSol, info] = scheme(xPrev, BCs, AD, Flag, t, dt)
-% handles the coupled or splitting scheme
-    if strcmp(Flag.scheme, "coupled")
-        fun = @(x) assembler(x,x0r, BCs,  AD, Flag, t, dt);
-        [xSol, info] = solver(fun, x0r, options, Flag, AD);
-       
-    elseif strcmp(Flag.scheme,"split")
-        % check options to see if i can change jacobian on the fly
-        Flag.operator = "transport";
-        funTrans = @(x) assembler(x, xPrev, BCs, AD, Flag, t, dt);
-        [xSol, info] = solver(funTrans, x0r, options, Flag, AD);
-
-        Flag.operator = "reaction";
-        funReact = @(x) assembler(x, xSol, BCs, AD, Flag, t, dt);
-        [xSol, info] = solver(funReact, xSol, options, Flag, AD);
-    end
-end
 
 
-function [xNew, info] = solver(fun, x0, options,Flag,AD)
-% decides between fsolve and newton
-    info = struct();
-    switch lower(Flag.method)
-        case 'fsolve'
-            [xNew, fval, exitflag, output] = fsolve(fun, x0, options);
-            info.fval = fval;
-            info.exitflag = exitflag;
-            info.output = output;
-        case 'newton'
-            [xNew, it] = newtonsys(fun, x0, AD.Nmaxit, AD.Ntoll, Flag.Nverbose);
-            info.iterations = it;
-        otherwise
-            error('Unknown method: %s', method);
-    end
-end
 
 function relativeError = computeRelErrors(xNew, xTemp, AD, Flag)
     relErrV = norm(xNew(AD.vIR) - xTemp(AD.vIR)) / max(norm(xTemp(AD.vIR)), eps);
@@ -153,6 +113,7 @@ function relativeError = computeRelErrors(xNew, xTemp, AD, Flag)
     relativeError = relErrV + relErrN + relErrP;
     if Flag.verbose, fprintf("\n||X||=%12.4e \t ||V||=%12.4e \t ||N||=%12.4e \t ||P||=%12.4e\n",  relativeError, relErrV,relErrN,relErrP); end
 end 
+
 
 function  solverOutput(step,info)
     if isfield(info, 'exitflag')

@@ -107,8 +107,8 @@ function Dati = datiPlasma(Param, Flag)
     Dati.pIR  = 2*lrr + 1 : 3*lrr;
 
     % indexes for interior and boundary elements of full vector x 
-    Dati.intIdxs = [2:AD.lr-1, AD.lr+2:2*AD.lr-1, 2*AD.lr+2:3*AD.lr-1];
-    Dati.bcsIdxs = [1, AD.lr,  AD.lr+1,  2*AD.lr, 2*AD.lr+1,  3*AD.lr];
+    Dati.intIdxs = [2:Dati.lr-1, Dati.lr+2:2*Dati.lr-1, 2*Dati.lr+2:3*Dati.lr-1];
+    Dati.bcsIdxs = [1, Dati.lr,  Dati.lr+1,  2*Dati.lr, 2*Dati.lr+1,  3*Dati.lr];
 
     if strcmp(Flag.VT, "linear")
         % linear increase from V0 to VT
@@ -204,6 +204,12 @@ function AD = adimPlasma(D, Flag)
     AD.v0 = D.v0/AD.Vbar;
     AD.x0 = [AD.v0; AD.n0; AD.p0];
     
+    % Matrices
+    AD.M_full = ax_mass(AD.r, 1);
+    AD.A_full = ax_laplacian(AD.r,AD.eps);
+    AD.M = 
+
+
 end
 
 

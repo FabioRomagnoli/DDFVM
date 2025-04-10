@@ -28,7 +28,7 @@ Param.dtMax = 1e-2;
 
 % Simulation settings
 Flag.model = "plasma";
-
+Flag.scheme = "coupled";
 
 Flag.method = "fsolve";             % "fsolve"/"newton"
 Flag.verbose = true;
@@ -47,22 +47,18 @@ Flag.saveSol = "temp";              % "no"/"SaveName"
 
 % Newton solver Parameters
 
-% this whole shenaningans and with set_options can probably be replaced by
-% Opt = optimoptions('fsolve'); and add the ones needed and pass it already
-% created.
+Opt = optimoptions('fsolve'); 
 
 % Fsolve options
 Opt.Display = "off";                        % "off"/"iter"/"final"/"final-detailed"
 Opt.SpecifyObjectiveGradient = false; 
 Opt.FiniteDifferenceType = "forward";       % "central"/"forward"
 % Opt.Algorithm = "levenberg-marquardt";    % "levenberg-marquardt
-
 % Opt.MaxIterations = 400;
 % Opt.MaxFunctionEvaluations = 50e4;
-% Opt.OptimalityTolerance = 1e-6;
+Opt.OptimalityTolerance = 1e-6;
 Opt.StepTolerance = 1e-6;
 Opt.FunctionTolerance = 1e-6;
-
 
 % Takes care of Parameters, Intial condition, and adimensionalization
 [Param, Dati, ADati] = initPlasma(Param, Flag);
