@@ -28,14 +28,10 @@ function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
     p = [p_bc(1); x(2*AD.lrr+1:end); p_bc(2)];
     
     % Matrix definitions
-    A_full =  ax_laplacian(AD.r,AD.eps);
-    M_full =  ax_mass(AD.r, 1);
     An_full = ax_dd(AD.r, v, AD.mun, AD.Vth, -1);
     Ap_full = ax_dd(AD.r, v, AD.mup, AD.Vth, 1); 
    
     % Get reduced matrix
-    A = A_full(2:end-1,2:end-1);
-    M = M_full(2:end-1,2:end-1);
     An = An_full(2:end-1,2:end-1);
     Ap = Ap_full(2:end-1,2:end-1);
     
