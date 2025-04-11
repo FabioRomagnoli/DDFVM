@@ -1,3 +1,5 @@
 *.asv
 *.txt
 /sim/pieces
+sim/checkpoint.mat
+*.asv

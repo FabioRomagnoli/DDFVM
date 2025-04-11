@@ -10,8 +10,7 @@ function [F,jac] = assemblerDiode(x, x0, BCs,  AD, dt)
     n_bc = BCs(3:4);
     p_bc = BCs(5:6);
 
-
-    % Extract vectors
+    % build vectors
     v = [v_bc(1); x(1:lrr); v_bc(2)];
     n = [n_bc(1); x(lrr+1:2*lrr); n_bc(2)];
     p = [p_bc(1); x(2*lrr+1:end); p_bc(2)];

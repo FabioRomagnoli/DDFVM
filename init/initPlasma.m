@@ -33,7 +33,7 @@ function Param = paramPlasma(Param)
     def.eps = 8.8e-12;             % Permittivity              [C]/([V][m])
     def.mup = 2e-4;                    % Diffusivity coefficients  [m2]/([s][V])
     def.mun = 1e2 * def.mup; 
-    
+
     def.q = 1.6e-19;                   % Charge                    [C] 
     def.Vth = 26e-3;                   % Thermal voltage           [V]
     
@@ -206,10 +206,11 @@ function AD = adimPlasma(D, Flag)
     
     % Matrices
     AD.M_full = ax_mass(AD.r, 1);
-    AD.A_full = ax_laplacian(AD.r,AD.eps);
     AD.M = AD.M_full(2:end-1,2:end-1);
+    
+    AD.A_full = ax_laplacian(AD.r,AD.eps);
     AD.A = AD.A_full(2:end-1,2:end-1);
-
+    AD.A_bc = AD.A_full(2:end-1,[1 end]);
 end
 
 

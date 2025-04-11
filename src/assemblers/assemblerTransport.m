@@ -1,4 +1,4 @@
-function [F,jac] = assemblerPlasmaJGenAlphaConst(x, x0, BCs,  AD, dt)
+function [F, jac]= assemblerTransport(x, x0, BCs, AD, dt)
     % Unpack
     M = AD.M;
     A = AD.A;
@@ -10,7 +10,7 @@ function [F,jac] = assemblerPlasmaJGenAlphaConst(x, x0, BCs,  AD, dt)
     n_bc = BCs(3:4);
     p_bc = BCs(5:6);
 
-    % Extract vectors
+    % build vectors
     v = [v_bc(1); x(1:lrr); v_bc(2)];
     n = [n_bc(1); x(lrr+1:2*lrr); n_bc(2)];
     p = [p_bc(1); x(2*lrr+1:end); p_bc(2)];
@@ -30,42 +30,30 @@ function [F,jac] = assemblerPlasmaJGenAlphaConst(x, x0, BCs,  AD, dt)
     % getting the first and last elements of the matrices 
     An_bc = An_full(2:end-1,[1 end]);
     Ap_bc = Ap_full(2:end-1,[1 end]);
-    
+
     % Full matrix construction
     zeri = zeros(lrr);
     NL = [A M -M; 
         zeri (M+dt*An) zeri; 
         zeri zeri (M+dt*Ap)];
-    
+
     % previous time step (no bounds)
     n0 = x0(lrr+1:2*lrr);
     p0 = x0(2*lrr+1:end);
 
     % system elements
     bounds = [A_bc*v_bc; dt*An_bc*n_bc; dt*Ap_bc*p_bc];
+    rhs = [M*AD.N(2:end-1); M*n0; M*p0];
 
-    rhs = [zeros(lrr,1);  M*n0  ; M*p0];
-
-    % Generation term
-    dr = diff(AD.r);
-    Jn = comp_current(AD.r,AD.mun,AD.Vth,-1,n, Bn, Bp);
-    alphalow = AD.alpha .* dr/2; alphahigh = AD.alpha .* dr/2;
-    R = abs(([0; alphalow.*Jn]+[alphahigh.*Jn; 0]));
-    gen = [zeros(lrr,1); dt*R(2:end-1) + dt*M*AD.S; dt*R(2:end-1) + dt*M*AD.S];
-    
-    
     % Build system
-    F = NL*x - gen + bounds - rhs;
-
-    % JACOBIAN 
+    F = NL*x  + bounds - rhs;
+    
     if nargout>1
         zeri = zeros(lrr);
-        
-        dAn = zeros(AD.lr, AD.lr);    
+
+        dAn = zeros(AD.lr, AD.lr);    % NB Si calcola anche la derivata in v0 e v(lr)( condiz al bordo), ma tanto sotto le rimuovo
         dAp = zeros(AD.lr, AD.lr);    
-        dAr = zeros(AD.lr, AD.lr);    
     
-        % derivatives in dv
         for i=2:AD.lr-1
             log_pos = 1/log(AD.r(i)/AD.r(i+1));
             log_neg = 1/log(AD.r(i-1)/AD.r(i));
@@ -86,31 +74,27 @@ function [F,jac] = assemblerPlasmaJGenAlphaConst(x, x0, BCs,  AD, dt)
             dAp(i,i) = log_pos * (p(i+1)*DB(-up_neg) + p(i)*DB(-up_pos)) +...
                             log_neg * (p(i)*DB(-dw_neg) + p(i-1)*DB(-dw_pos));
             dAp(i,i+1) = log_pos * (-p(i+1) * DB(-up_neg) - p(i)*DB(-up_pos));
-       
     
-            dAr(i,i-1) = -((AD.r(i)-AD.r(i-1))/2) *log_neg * (n(i)*DB(dw_neg) + n(i-1)*DB(dw_pos));
-            dAr(i,i) = ((AD.r(i+1)-AD.r(i))/2) * log_pos * (-n(i+1)*DB(up_neg) - n(i)*DB(up_pos)) -...
-                            ((AD.r(i)-AD.r(i-1))/2) * log_neg * (-n(i)*DB(dw_neg) - n(i-1)*DB(dw_pos));
-            dAr(i,i+1) = ((AD.r(i+1)-AD.r(i))/2) * log_pos * (n(i+1)*DB(up_neg) + n(i)*DB(up_pos));
         end
-    
-        Ar_full = ax_gen(AD.r, AD.mun, AD.alpha, AD.Vth, -1, Bp, Bn); % generation term
-        dRn = dt*Ar_full(2:end-1,2:end-1);
-    
+        
+        % potrebbero esserci dei termini che dividono dAn e dAp dai vol finiti
+        
         J11 = A;
         J12 = M;
         J13 = -M;
-    
-        J21 = dt*AD.mun*dAn(2:end-1, 2:end-1) - AD.alpha*AD.mun*dt*dAr(2:end-1,2:end-1);;
-        J22 = M + dt*An - dRn;
+
+        J21 = dt*AD.mun*dAn(2:end-1, 2:end-1);
+        J22 = M + dt*An;
         J23 = zeri;
-    
-        J31 = dt*AD.mup*dAp(2:end-1, 2:end-1) - AD.alpha*AD.mun*dt*dAr(2:end-1,2:end-1); 
-        J32 = - dRn;
+
+        J31 = dt*AD.mup*dAp(2:end-1, 2:end-1); 
+        J32 = zeri;
         J33 = M + dt*Ap;
-    
+
         jac = [J11, J12, J13;
                J21, J22, J23;
-               J31, J32, J33];   
+               J31, J32, J33];
+    
     end
+
 end

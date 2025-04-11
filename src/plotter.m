@@ -30,9 +30,6 @@ function concentrationPlot(R, D, F)
         nk = R.Sol(D.nIdxs,k);
         pk = R.Sol(D.pIdxs,k);
 
-
-
-
         clf; % Clear figure before plotting new data
         title(['Electron and hole concentrations at V = ', num2str(vk(1))]);
         hold on;
@@ -100,12 +97,14 @@ function currentPlot(R, D, F)
         nk = R.Sol(D.nIdxs,k);
         pk = R.Sol(D.pIdxs,k);
 
+        % Compute bimu bernulli only once
+        [Bp, Bn] = bimu_bernoulli (diff(vk) / D.Vth);
 
         clf; % Clear figure before plotting new data
         title(['Current at V = ', num2str(vk(1))]);
 
-        Jn = 2*pi*D.q*comp_current(D.r,D.mun,vk,D.Vth,-1,nk);
-        Jp = 2*pi*D.q*comp_current(D.r,D.mup,vk,D.Vth, 1,pk);
+        Jn = 2*pi*D.q*comp_current(D.r,D.mun,D.Vth,-1,nk, Bn, Bp);
+        Jp = 2*pi*D.q*comp_current(D.r,D.mup,D.Vth, 1,pk, Bp, Bn);
         JJ = Jn + Jp;
 
         hold on;
@@ -126,12 +125,15 @@ end
 function generationPlot(R, D, F)
     if F.generationPlot == "none", return; end
 
+    % Compute bimu_bernulli
+    [Bp, Bn] = bimu_bernoulli (diff(R.Sol(D.vIdxs,end)) / D.Vth);
+
     % With matrix
-    Ar = ax_gen(D.r, R.Sol(D.vIdxs,end), D.mun, R.alpha, D.Vth, -1);
+    Ar = ax_gen(D.r, D.mun, R.alpha, D.Vth, -1, Bn, Bp);
     
     % generation term
     dr = diff(D.r);
-    Jn = comp_current(D.r,D.mun,R.Sol(D.vIdxs,end),D.Vth,-1,R.Sol(D.nIdxs,end));
+    Jn = comp_current(D.r,D.mun,D.Vth,-1,R.Sol(D.nIdxs,end),Bn, Bp);
 
     % Alpha term
     if strcmp(F.alpha,"const")

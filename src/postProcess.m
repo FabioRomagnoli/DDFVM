@@ -24,9 +24,15 @@ end
 
 
 function Res = finalCurrent(D, Res, Flag)
+
+    % Compute bimu bernulli only once
+    DV =  diff(Res.Sol(D.vIdxs,end)) / D.Vth;
+    [Bp, Bn] = bimu_bernoulli (DV);
+
+
     % the 2*pi comes from the radial contribution 
-    Res.Jn = 2*pi*D.q*comp_current(D.r, D.mun, Res.Sol(D.vIdxs,end), D.Vth, -1, Res.Sol(D.nIdxs,end));
-    Res.Jp = 2*pi*D.q*comp_current(D.r, D.mup, Res.Sol(D.vIdxs,end), D.Vth, 1, Res.Sol(D.pIdxs,end));
+    Res.Jn = 2*pi*D.q*comp_current(D.r, D.mun, D.Vth, -1, Res.Sol(D.nIdxs,end), Bn, Bp);
+    Res.Jp = 2*pi*D.q*comp_current(D.r, D.mup, D.Vth, 1, Res.Sol(D.pIdxs,end), Bp, Bn);
     Res.JJ = Res.Jn + Res.Jp;
 
     if std(Res.JJ) / mean(Res.JJ) < 1e-2 
@@ -43,11 +49,14 @@ function Res = computeAlpha(D, Res, Flag)
     if Flag.compAlpha
         Res.genInt = ax_mass(D.r, 1)*D.gen;
         intGen = sum(Res.genInt(2:end-1));
-    
+
+        % Compute bimu bernulli only once
+        [Bp, Bn] = bimu_bernoulli (diff(Res.Sol(D.vIdxs,end)) / D.Vth);
+
         % generation term
         dr = diff(D.r);
-        Jn = comp_current(D.r,D.mun, Res.Sol(D.vIdxs,end),D.Vth,-1, Res.Sol(D.nIdxs,end));
-    
+        Jn = comp_current(D.r, D.mun, D.Vth, -1, Res.Sol(D.nIdxs,end), Bn, Bp);
+
         % Alpha term
         if strcmp(Flag.alpha,"const")
             alphalow = dr/2; alphahigh = dr/2;

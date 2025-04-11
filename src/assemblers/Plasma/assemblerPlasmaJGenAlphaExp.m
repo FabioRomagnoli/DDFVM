@@ -1,4 +1,4 @@
-function [F,jac] = assemblerPlasmaJGenAlphaExp(x, x0, BCs,  AD, Flag, dt)
+function [F,jac] = assemblerPlasmaJGenAlphaExp(x, x0, BCs,  AD, dt)
     % Unpack
     M = AD.M;
     A = AD.A;
