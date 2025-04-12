@@ -1,6 +1,7 @@
 function Res = postProcess(D, AD, Res, Flag)
     Res = redim(D,AD,Res);
 
+    % computes the final current if steady
     Res = finalCurrent(D, Res, Flag);
 
     if  strcmp(Flag.model, "plasma")
@@ -37,10 +38,10 @@ function Res = finalCurrent(D, Res, Flag)
 
     if std(Res.JJ) / mean(Res.JJ) < 1e-2 
         Ic = mean(Res.JJ);
-        fprintf('Ic = %.5e ', Ic);
-        if strcmp(Flag.model,"plasma"), fprintf('Iz = %.5e, diff = %.5g\n',  D.Iz, abs(D.Iz - Ic)); else fprintf("\n"); end
+        fprintf('\nIc = %.5e ', Ic);
+        if strcmp(Flag.model,"plasma"), fprintf('Iz = %.5e, diff = %.5g',  D.Iz, abs(D.Iz - Ic)); end
     else
-        fprintf('JJ is not constant. \n');
+        fprintf('\nJJ is not constant.');
     end
 end
 
@@ -71,11 +72,11 @@ function Res = computeAlpha(D, Res, Flag)
         if strcmp(Flag.alpha,"const")
             Res.alpha = intGen/intJ;
             Res.beta =  D.beta;
-            fprintf('alpha = %.3f\n', Res.alpha);
+            fprintf('\nalpha = %.3f', Res.alpha);
         elseif strcmp(Flag.alpha,"exp")
             Res.beta =  intGen/intJ;
             Res.alpha = D.alpha;
-            fprintf('beta = %.3f\n', Res.beta);
+            fprintf('\nbeta = %.3f', Res.beta);
         end
     else 
         Res.alpha = D.alpha;
@@ -91,6 +92,6 @@ function saveFile(D, AD, Res, Flag)
         file.ADati = AD;
         file.Flag = Flag;
         save(fullfile(".\sim\", Flag.saveSol), 'file');
-        fprintf("Saved Solution %a",Flag.saveSol);
+        fprintf("\nSaved Solution %a",Flag.saveSol);
     end
 end

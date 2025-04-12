@@ -7,16 +7,17 @@ addpath(genpath('.\src'))
 
 % Hyper parameters Plasma
 Param = struct();
-Param.lr = 51;
+Param.lr = 101;
 Param.K = 1000;                 % Time grid points
-Param.dt = 2e-4;                % Time separation  [s]
-Param.T = 2;                    % Total simulation time
+Param.dt = 1e-3;                % Time separation  [s]
+Param.T = 100;                    % Total simulation time
 Param.V0 = 0;                   % Voltage at r=1 and t=1  [V]
 % Param.VT = 0;                 % Ending voltage at r=1 and t=K*dt  [V]
 Param.tolError = 1e-3;          % Adaptive time stepping tollerance
 % Param.alpha = 11396.798;      % for alpha constant    
 % Param.beta = 342439.622;      % for alpha exponential
 
+% MUs
 Param.mup = 1.86e-4;
 Param.mun = 5e-2;
 
@@ -27,38 +28,39 @@ Param.scalingPower = 0.25; % lower to reduce swinging in dt
 
 % Bounds dt
 Param.dtMin = 1e-15;
-Param.dtMax = 2e-4;
+Param.dtMax = 1e-2;
+
+
 
 % Simulation settings
-Flag.model = "plasma";
-Flag.scheme = "coupled";
+Flag.model = "plasma";              
+Flag.scheme = "coupled";            % "coupled"/"split"                                                 (scheme.m)
 
-Flag.method = "fsolve";             % "fsolve"/"newton"
-Flag.verbose = true;
-Flag.Nverbose = 0;
+Flag.method = "fsolve";             % "fsolve"/"newton"                                                 (scheme.m)
+Flag.verbose = true;                % verbosity of the output                                           (scheme.m)
+Flag.Nverbose = 0;                  % verbsotiy of newton solver (comparable to opt.display)            (scheme.m)
 
-Flag.adaptive = true;        
-Flag.CheckGradients = false;
+Flag.adaptive = true;               % fixed time step or adaptive                                       (simulate.m)
+Flag.CheckGradients = false;        % checks for jacobian correctness                                   (scheme.m)
+    
+Flag.genterm = 'non-const';         % non-const/const;               const is mainly for testing        (scheme.m)
+Flag.compAlpha = true;              % whether or not to compute alpha (or beta) at the end              (postProcess.m)
+Flag.alpha = "exp";                 % "const"/"exp"                  controls how the alpha is treated  (scheme.m)
+Flag.VT = "plateu";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
 
-Flag.genterm = 'non-const';         % non-const/const;
-Flag.compAlpha = true;              % whether to compute alpha or beta at the end
-Flag.alpha = "exp";                 % "const"/"exp"
-Flag.VT = "plateu";                 % "linear"/"piecewise"/"plateu"
 
-Flag.loadSol = "checkpoint";                % "no"/"SaveName"
-Flag.saveSol = "temp";              % "no"/"SaveName"
+Flag.loadSol = "checkpoint";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
+Flag.saveSol = "temp";              % "no"/"SaveName"                                                   (postProcess.m)
 
-% Newton solver Parameters
 
 
 % Fsolve options
 Opt = optimoptions('fsolve'); 
 Opt.Display = "off";                        % "off"/"iter"/"final"/"final-detailed"
-Opt.SpecifyObjectiveGradient = false; 
+Opt.SpecifyObjectiveGradient = false;       % JACOBIAN
 Opt.FiniteDifferenceType = "forward";       % "central"/"forward"
-% Opt.Algorithm = "levenberg-marquardt";    % "levenberg-marquardt
 % Opt.MaxIterations = 400;
-Opt.MaxFunctionEvaluations = 4e4;
+% Opt.MaxFunctionEvaluations = 4e4;
 % Opt.OptimalityTolerance = 1e-6;
 % Opt.StepTolerance = 1e-6;
 % Opt.FunctionTolerance = 1e-6;
@@ -79,12 +81,10 @@ diary on;
 tic;
 try
     % ACTUAL SOLVER
-    Results.ASol = solve(Dati, ADati, Flag, Opt);
+    Results.ASol = simulate(Dati, ADati, Flag, Opt);
 catch ME
     fprintf(2, '\n%s\n', getReport(ME, 'extended'));
-    
     diary off;
-    
     return
 end
 

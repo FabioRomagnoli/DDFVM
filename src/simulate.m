@@ -1,4 +1,4 @@
-function [solution] = solve(D, AD, Flag, Opt)
+function [solution] = simulate(D, AD, Flag, Opt)
     dt = AD.dt;
 
     file.Dati = D;
@@ -8,22 +8,26 @@ function [solution] = solve(D, AD, Flag, Opt)
     % Load solution as starting point 
     if ~strcmp(Flag.loadSol,"no")
         load(fullfile(".\sim\", Flag.loadSol));
-        fprintf("\nLoaded Solution %s",Flag.loadSol);
-        
+        loadKf = length(file.Res.ASol(1,:));
         % In case of resuming simulation handles the differences
-        if strcmp(Flag.loadSol,"checkpoint")  && length(file.Res.ASol(1,:)) ~= file.Dati.K
-            D.K = D.K - length(file.Res.ASol(1,:));
-            AD.K = AD.K - length(file.Res.ASol(1,:));
+        if strcmp(Flag.loadSol,"checkpoint")  ... % is named checkpoint
+                && loadKf ~= file.Dati.K ... % it hasn't finished 
+                && file.Dati.K  == D.K && file.Dati.T == D.T % same simulation  time and K
 
-            D.T = D.T - D.tsave(length(file.Res.ASol(1,:)));
-            AD.T = AD.T - AD.tsave(length(file.Res.ASol(1,:)));
+            D.K = D.K - loadKf;
+            AD.K = AD.K - loadKf;
 
-            D.tsave = D.tsave(length(file.Res.ASol(1,:)):end);
-            AD.tsave = AD.tsave(length(file.Res.ASol(1,:)):end);
+            D.T = D.T - D.tsave(loadKf);
+            AD.T = AD.T - AD.tsave(loadKf);
+
+            D.tsave = D.tsave(loadKf:end);
+            AD.tsave = AD.tsave(loadKf:end);
             solution = file.Res.ASol;
+            fprintf("\nLoaded from checkpoint at time t = %g", D.tsave(1));
         else
             % otherwise just take the last  value of the solution 
             solution(:,1) = file.Res.ASol(:,end);
+            fprintf("\nLoaded initial point from simulation %s", Flag.loadSOl);
         end
     else
         solution(:,1) = AD.x0;       % x0 serves as the prev time step and as inital guess
@@ -44,6 +48,9 @@ function [solution] = solve(D, AD, Flag, Opt)
         disp("-----------------------------------------------------")
         solution(:,end+1) = x1;
 
+        % Saves checkpoint
+        file.Res.ASol = solution;
+        save(fullfile(".\sim\", "checkpoint"), 'file');
 
         % to stop execution create a file "STOP_NOW.txt" in DDFVM folder
         % cleanly exits loop
@@ -53,9 +60,6 @@ function [solution] = solve(D, AD, Flag, Opt)
             return
         end
 
-        % Saves checkpoint
-        file.Res.ASol = solution;
-        save(fullfile(".\sim\", "checkpoint"), 'file');
     end
 end
 

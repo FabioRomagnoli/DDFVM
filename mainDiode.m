@@ -59,7 +59,7 @@ Opt.FunctionTolerance = 1e-6;
 [Param, Dati, ADati] = initDiode(Param, Flag);
 
 % Solve
-Results.ASol = solve(ADati, Flag, Opt);
+Results.ASol = simulate(ADati, Flag, Opt);
 
 %% Postprocessing
 Results = postProcess(Dati, ADati, Results, Flag);
