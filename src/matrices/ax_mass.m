@@ -1,4 +1,5 @@
 function F = ax_mass (r, mu)
+
   dd = [0; diff(r)/2] + [diff(r)/2; 0];
   dd = mu .* dd .* r;
   F = diag (dd);

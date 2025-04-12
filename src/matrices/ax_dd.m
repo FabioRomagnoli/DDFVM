@@ -5,6 +5,7 @@ function F = ax_dd (r, mu, Vth, Bp, Bn)
 
   logTerm = (log(r(1:end-1) ./ r(2:end)));
 
+  
   fll = - mu * Vth .* Bp ./ logTerm;
   fld =   mu * Vth .* Bn ./ logTerm;
 

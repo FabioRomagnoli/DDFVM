@@ -7,7 +7,6 @@ function J = comp_current(r,mu,Vth,z,n, Bp, Bn)
   nBn = n(2:end).*Bn;
   nBp = n(1:end-1).*Bp;
 
-  % unsure of the z
   J = z*mu*Vth./(log(r(1:end-1) ./ r(2:end))).*(nBn-nBp);
 end
 
