@@ -29,7 +29,7 @@ Flag.model = "diode";
 Flag.scheme = "coupled";
 
 Flag.verbose = true;
-Flag.Nverbose = 0;
+Flag.Nverbose = false;
 
 Flag.method = "fsolve";         % "fsolve"/"newton"
 Flag.adaptive = false;        

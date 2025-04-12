@@ -19,7 +19,6 @@ function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
     Ap = Ap_full(2:end-1,2:end-1);
     
     % getting the first and last elements of the matrices 
-    A_bc = A_full(2:end-1,[1 end]);
     An_bc = An_full(2:end-1,[1 end]);
     Ap_bc = Ap_full(2:end-1,[1 end]);
     
