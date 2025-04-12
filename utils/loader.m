@@ -6,15 +6,15 @@ fprintf("Loaded Solution %s\n",loadSol);
 
 %% 
 file.Flag.saveSol = "no";
-Results = postProcess(file.Dati, file.ADati, file.Res, file.Flag);
+Res = postProcess(file.Dati, file.ADati, file.Res, file.Flag);
 
 %%
 file.Flag.concentrationPlot = "none";    % "all"/"last"/"none"
 file.Flag.potentialPlot = "none";
-file.Flag.currentPlot = "last";
+file.Flag.currentPlot = "none";
 file.Flag.generationPlot = "Y";
 
-plotter(Results,file.Dati,file.Flag);
+plotter(Res,file.Dati,file.Flag);
 
 
 %%

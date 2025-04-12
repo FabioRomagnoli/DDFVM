@@ -46,6 +46,7 @@
 %             fprintf('%-8d %-8d %-22.6e %-22.6e %-22.6e %-22.6e\n', r, c, anaVal, fdVal, absDiff, relDiff);
 %         end
 %         fprintf('Consider lowering tol or re-checking your derivative implementation.\n');
+%         error("Failed check gradient\n"); 
 %     end
 % end
 
@@ -153,6 +154,7 @@ function [isValid, diffMatrix, relDiffMatrix] = checkJacobian(fun, x, tol)
             fprintf('%-8d %-8d %-22.6e %-22.6e %-22.6e %-22.6e\n', r, c, anaVal, fdVal, absDiff, relDiff);
         end
         fprintf('Consider lowering tol or re-checking your derivative implementation.\n');
+        error("Failed check gradient\n"); 
     end
 end
  

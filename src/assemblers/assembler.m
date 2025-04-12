@@ -1,7 +1,4 @@
-function [F,jac] = assembler(x, x0, BCs,  AD, Flag, dt)
-    A = AD.A;
-    M = AD.M;
-
+function [F,jac] = assembler(x, x0, BCs,  AD, Flag, t, dt)
     % get boundary
     v_bc = BCs(1:2);
     n_bc = BCs(3:4);
@@ -12,6 +9,7 @@ function [F,jac] = assembler(x, x0, BCs,  AD, Flag, dt)
     n = [n_bc(1); x(AD.lrr+1:2*AD.lrr); n_bc(2)];
     p = [p_bc(1); x(2*AD.lrr+1:end); p_bc(2)];
     
+
     % Matrix definitions
     An_full = ax_dd(AD.r, v, AD.mun, AD.Vth, -1);
     Ap_full = ax_dd(AD.r, v, AD.mup, AD.Vth, 1); 
@@ -21,6 +19,7 @@ function [F,jac] = assembler(x, x0, BCs,  AD, Flag, dt)
     Ap = Ap_full(2:end-1,2:end-1);
     
     % getting the first and last elements of the matrices 
+    A_bc = A_full(2:end-1,[1 end]);
     An_bc = An_full(2:end-1,[1 end]);
     Ap_bc = Ap_full(2:end-1,[1 end]);
     
@@ -35,7 +34,7 @@ function [F,jac] = assembler(x, x0, BCs,  AD, Flag, dt)
     p0 = x0(2*AD.lrr+1:end);
 
     % system elements
-    bounds = [AD.A_bc*v_bc; dt*An_bc*n_bc; dt*Ap_bc*p_bc];
+    bounds = [A_bc*v_bc; dt*An_bc*n_bc; dt*Ap_bc*p_bc];
 
     if strcmp(Flag.model,"diode")
         rhs = [M*AD.N(2:end-1); M*n0; M*p0];

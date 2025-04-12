@@ -145,8 +145,7 @@ function Dati = datiDiode(Param, Flag)
     end
 
 
-    Dati.tsave = linspace(0, Dati.T, Dati.K+1);
-end
+nend
 
 
 function AD = adimDiode(D, Flag)
@@ -213,6 +212,4 @@ function AD = adimDiode(D, Flag)
     AD.A_full = ax_laplacian(AD.r,AD.eps);
     AD.A = AD.A_full(2:end-1,2:end-1);
     AD.A_bc = AD.A_full(2:end-1,[1 end]);
-
-
 end
