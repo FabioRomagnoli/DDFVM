@@ -98,12 +98,10 @@ Results = postProcess(Dati, ADati, Results, Flag);
 % Plotting Flags
 Flag.concentrationPlot = "last";    % "all"/"last"/"none"
 Flag.potentialPlot = "none";
-Flag.currentPlot = "all";
+Flag.currentPlot = "last";
 
 Flag.generationPlot = "none";
 
 plotter(Results,Dati,Flag);
-
-
 
 diary off;
