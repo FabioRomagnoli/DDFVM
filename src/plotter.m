@@ -8,24 +8,32 @@ function plotter(R, D, F)
     % Electrical  current J
     currentPlot(R, D, F);
 
-    if strcmp(F.model,"plasma")
-        % comparison of rhs generation, prev used for db
-        generationPlot(R,D,F);
-    end
+    % comparison of rhs generation, prev used for debugging plasma
+    generationPlot(R,D,F);
 end
 
 
 function concentrationPlot(R, D, F)
-    switch F.concentrationPlot
-        case "none"
-            return
-        case "last"
-            ks = R.kf;
-        case "all"
-            ks = 1;
+    if isfield(F, 'concentrationPlot')
+        switch F.concentrationPlot
+            case "none"
+                return
+            case "last"
+                ks = R.kf;
+                skip = 1;
+            case "all"
+                ks = 1;
+                skip = 1;
+            case "reduced"
+                ks = 1;
+                skip = 10;
+        end    
+    else
+        return
     end
+
     figure;
-    for k=ks:R.kf
+    for k=ks:skip:R.kf
         vk = R.Sol(D.vIdxs,k);
         nk = R.Sol(D.nIdxs,k);
         pk = R.Sol(D.pIdxs,k);
@@ -35,10 +43,11 @@ function concentrationPlot(R, D, F)
         hold on;
         plot(D.r,pk, 'LineWidth', 1, "DisplayName", "p");
         plot(D.r,nk, 'LineWidth', 1, "DisplayName", "n");
+        plot(D.r,sqrt(nk.*pk), 'LineWidth',1, "DisplayName","$\sqrt{n+p}$");
         hold off;
 
-        grid on; 
-        legend();
+        % grid on; 
+        legend('Interpreter', 'latex');        
         set(gca, 'YScale', 'log')
         set(gca, 'XScale', 'log')
 
@@ -51,17 +60,27 @@ function concentrationPlot(R, D, F)
 end
 
 function potentialPlot(R, D, F)
-    switch F.potentialPlot
-        case "none"
-            return
-        case "last"
-            ks = R.kf;
-        case "all"
-            ks = 1;
-    end        
+    if isfield(F, 'potentialPlot')
+        switch F.potentialPlot
+            case "none"
+                return
+            case "last"
+                ks = R.kf;
+                skip = 1;
+            case "all"
+                ks = 1;
+                skip = 1;
+            case "reduced"
+                ks = 1;
+                skip = 10;
+        end   
+    else
+        return
+    end
+
     figure;
     title('Electric potential')
-    for k = ks:R.kf
+    for k = ks:skip:R.kf
 
         clf; % Clear figure before plotting new data
         vk = R.Sol(D.vIdxs, k);
@@ -79,19 +98,31 @@ function potentialPlot(R, D, F)
 end
     
 function currentPlot(R, D, F)
-    switch F.currentPlot
-        case "none"
-            return
-        case "last"
-            ks = R.kf;
-        case "all"
-            ks = 1;
-    end    
+    if isfield(F, 'currentPlot')
+        switch F.currentPlot
+            case "none"
+                return
+            case "last"
+                ks = R.kf;
+                skip = 1;
+            case "all"
+                ks = 1;
+                skip = 1;
+            case "reduced"
+                ks = 1;
+                skip = 10;
+            case "lastFew"
+                ks = R.kf - 100;
+                skip = 1;
+        end    
+    else
+        return
+    end
 
     figure;
 
     rhalf = (D.r(1:end-1) + D.r(2:end))/2;
-    for k=ks:R.kf
+    for k=ks:skip:R.kf
 
         vk = R.Sol(D.vIdxs,k);
         nk = R.Sol(D.nIdxs,k);
@@ -123,6 +154,7 @@ function currentPlot(R, D, F)
 end
 
 function generationPlot(R, D, F)
+    if ~isfield(F, 'generationPlot'), return; end
     if F.generationPlot == "none", return; end
 
     % Compute bimu_bernulli

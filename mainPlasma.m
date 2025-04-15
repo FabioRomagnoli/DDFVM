@@ -49,7 +49,7 @@ Flag.alpha = "exp";                 % "const"/"exp"                  controls ho
 Flag.VT = "plateu";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
 
 
-Flag.loadSol = "no";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
+Flag.loadSol = "checkpoint";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
 Flag.saveSol = "temp";              % "no"/"SaveName"                                                   (postProcess.m)
 
 

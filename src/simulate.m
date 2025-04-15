@@ -23,7 +23,7 @@ function [solution] = simulate(D, AD, Flag, Opt)
             D.tsave = D.tsave(loadKf:end);
             AD.tsave = AD.tsave(loadKf:end);
             solution = file.Res.ASol;
-            fprintf("\nLoaded from checkpoint at time t = %g", D.tsave(1));
+            fprintf("\nLoaded from checkpoint at time t = %g\n", D.tsave(1));
         else
             % otherwise just take the last  value of the solution 
             solution(:,1) = file.Res.ASol(:,end);
@@ -65,7 +65,7 @@ end
 
 
 function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
-    while t + AD.dtMin/2 < t1
+    while t + 1e-8 < t1
         dtBest = dt;
         % clean leftovers before saving step
         if (t + dt > t1)
@@ -77,16 +77,16 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
 
         if Flag.verbose, fprintf("\n1) dt: "); end         % + dt
         [xNew, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt);
-        if info.exitflag == 0, dt= dt*0.75; fprintf("\t Reducing dt\n\n"); continue; end
+        if isfield(info, 'exitflag') && info.exitflag == 0 && Flag.verbose, dt= dt*0.75; fprintf("\t Reducing dt\n\n"); continue; end
 
         if Flag.adaptive
             if Flag.verbose, fprintf("\t2) dt/2: "); end   % + dt/2
             [xTemp, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt/2);
-            if info.exitflag < 0, error(info.output.message); end
+            if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
 
             if Flag.verbose, fprintf("\t3) dt/2: "); end   % + dt/2
             [xTemp, info] = scheme(xTemp, BCs, AD, Flag, Opt, t+dt/2, dt/2);
-            if info.exitflag < 0, error(info.output.message); end
+            if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
     
             relativeError = computeRelErrors(xNew, xTemp, AD, Flag);
             timeScaling = max(0.5, min(1.3, AD.stepBuffer * (AD.tolError / relativeError)^AD.scalingPower));
@@ -94,7 +94,7 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
             dtNew = dt * timeScaling;
             if relativeError < AD.tolError
                     t = t + dt;
-                    fprintf("\n(+) Step accepted\n\n");
+                    if Flag.verbose, fprintf("\n(+) Step accepted\n\n"); end
 
                     % Update boundary and interior solution
                     x0(1) = AD.Vt(t);           % Update boundary condition
@@ -104,7 +104,7 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
                     dt = min(dtNew, AD.dtMax);
             else
                     if dt <= AD.dtMin, return; end      % avoids repetitive loop  
-                    fprintf("\n(-) Step rejected\n\n");	
+                    if Flag.verbose, fprintf("\n(-) Step rejected\n\n"); end
                     dt = max(dtNew, AD.dtMin);
             end
         else % of adaptive if

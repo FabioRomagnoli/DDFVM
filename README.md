@@ -15,15 +15,8 @@ implemented
 - dynamic stopping
 
 missing
-- operator splitting for diodes  (for plasma too)?
-    - assembler needs to  build the different operators
-    - can be done with mix and match and a method for coupling them
-- the timestepping scheme can be abstracted to be general enough to be used
-  in the splitting too
-- set_optiosn can be removed?
-- 
-- fix jacobian for plasmas and check the diode one
- - 
+- operator splitting for for plasma?
+- fix jacobian for plasmas 
 
 
 

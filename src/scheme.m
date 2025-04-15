@@ -79,7 +79,7 @@ function [xNew, info] = solver(fun, x0, options,Flag,AD)
             error('Unknown method: %s', Flag.method);
     end
 
-    solverOutput(info); 
+   if Flag.verbose, solverOutput(info); end
 end
 
 
