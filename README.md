@@ -1,25 +1,3 @@
-implemented 
-- newton
-- piecewise voltage increase
-- formatted output
-- unified compcurrent (RHS of plasma)
-- saving and loading files also from checkpoint
-- dynamic plotting
-- alpha exponential 
-- term by term check gradient
-- adaptive time stepping with error scaling
-- formatted exit flag output for better control of solve
-- runtime stopping
-- config files 
-
-TODO
-- operator splitting for for plasma?
-- fix jacobian for plasmas 
-- linear combination of grad(phi) in alpha
-- third function in the system for negative ions
-- townsend reactions
-
-
 ## Features
 This code implements a solver for a Drift diffusion system coupled with the poisson equation. Known as Van Roesenboek system
 It works for simulating the charges and holes in a diode, or for ions and electrons in plasmas.
@@ -48,6 +26,28 @@ The last line says whether the full time step was good enough to be accepted or 
 
 
 
+implemented 
+- newton
+- piecewise voltage increase
+- formatted output
+- unified compcurrent (RHS of plasma)
+- saving and loading files also from checkpoint
+- dynamic plotting
+- alpha exponential 
+- term by term check gradient
+- adaptive time stepping with error scaling
+- formatted exit flag output for better control of solve
+- runtime stopping
+- config files 
+
+TODO
+- operator splitting for for plasma?
+- fix jacobian for plasmas 
+- linear combination of grad(phi) in alpha
+- third function in the system for negative ions
+
+
+
 % Random comments  found in paper
 The major drawback is that it might converge very
 slowly or even fail to converge if the starting guess is too far from the actual solution.
@@ -56,3 +56,5 @@ convergence region. Another remedy is parameter embedding where one slowly chang
 a parameter, always using the old solution as a new starting guess. We have already
 employed this embedding technique in Section 2.6 when gradually increasing the bias
 voltage in the solution procedure.
+
+
