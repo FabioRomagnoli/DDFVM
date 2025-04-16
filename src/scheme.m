@@ -23,6 +23,7 @@ function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
             fprintf("\n\t Reaction: ")
             funReact = @(x) assemblerDiodeReaction(x, xSol, BCs, AD, dt);
             [xSol, info] = solver(funReact, xSol, Opt, Flag, AD);
+            fprintf("\n\n")
         otherwise
             error('Unknown scheme: %s', Flag.scheme);
     end
@@ -72,14 +73,14 @@ function [xNew, info] = solver(fun, x0, options,Flag,AD)
             info.exitflag = exitflag;
             info.output = output;
         case 'newton'
-            % NEED TO CHANGE Nmaxit and Ntoll  to Flag for coherence
             [xNew, it] = newtonsys(fun, x0, AD.Nmaxit, AD.Ntoll, Flag.Nverbose);
             info.iterations = it;
         otherwise
             error('Unknown method: %s', Flag.method);
     end
 
-   if Flag.verbose, solverOutput(info); end
+   if Flag.verbose, solverOutput(info);   fprintf("\t"); end
+
 end
 
 

@@ -92,6 +92,6 @@ function saveFile(D, AD, Res, Flag)
         file.ADati = AD;
         file.Flag = Flag;
         save(fullfile(".\sim\", Flag.saveSol), 'file');
-        fprintf("\nSaved Solution %a",Flag.saveSol);
+        fprintf("\nSaved Solution to %s.m \n",Flag.saveSol);
     end
 end

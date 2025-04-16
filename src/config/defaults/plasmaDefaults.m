@@ -8,7 +8,7 @@ function [def, Param] = plasmaDefaults(Param)
     
     % Load exp data from Zheng
     if ~isfield(Param,"ZhengIdx"), Param.("ZhengIdx") = 14; end
-    load('.\utils\ExpData.mat');
+    load('.\src\utils\ExpData.mat');
     def.Iz = xxZheng(Param.ZhengIdx,"I").(1) * 10^(-4);     % microV/cm converted to V/m
     def.Vz = xxZheng(Param.ZhengIdx,"V").(1) * 10^(3);      % kV converted to V
     def.V0 = def.Vz;                   % Voltage at r=1 and t=1  [V]

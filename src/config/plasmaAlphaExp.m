@@ -1,7 +1,7 @@
-function [Param, Flag, Opt] = config()
+function [Param, Flag, Opt] = plasmaAlphaExp()
     % Simulation settings
     Flag.model = "plasma";               % Model selection
-    Flag.verbose = false;
+    Flag.verbose = true;
    
     Flag.scheme = "coupled";            % "coupled"/"split"                                                 (scheme.m)
     Flag.method = "fsolve";             % "fsolve"/"newton"                                                 (scheme.m)
@@ -19,7 +19,7 @@ function [Param, Flag, Opt] = config()
 
 
     % Hyperparameters 
-    Param.lr = 51;                   % Space grid points
+    Param.lr = 61;                   % Space grid points
     Param.K = 1000;                  % Time grid points
     Param.dt = 1e-4;                 % Time separation [s]
     Param.T = 100;                   % Total simulation time [s]

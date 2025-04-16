@@ -25,13 +25,14 @@ function [userParam, Dati, ADati, Flag, Results] = main(configName)
             [Param, Dati, ADati] = initPlasma(userParam, Flag);
     end
 
-
     % Print complete configuration: parameters (user-specified vs. defaults), flags, and options
     printConfiguration(userParam, Param, userFlag, Flag, userOpt, Opt);
         
+    input('Press Enter to continue...','s');
+
     % Run the simulation and time it
     tic;
-    Results.ASol = simulate(Dati, ADati, Flag, Opt);
+    Results.ASol = simulation(Dati, ADati, Flag, Opt);
     Results.elapsedTime = toc;
     
     % Postprocessing of the results
@@ -80,7 +81,7 @@ function printConfiguration(userParam, fullParam, userFlag, fullFlag, userOpt, O
     %   fullParam - full parameter structure returned by initPlasma (combining user and default values)
     %   Flag      - structure containing simulation flags
     %   Opt       - structure containing fsolve options
-    
+
     fprintf('========================================\n');
     fprintf('        Simulation Configuration        \n');
     fprintf('========================================\n');
@@ -106,9 +107,11 @@ function printConfiguration(userParam, fullParam, userFlag, fullFlag, userOpt, O
             valueStr = '[non-displayable]';
         end
         
-        fprintf('  %-15s : %-20s (%s)\n', fieldName, valueStr, specType);
+        fprintf('  %25s: %-25s (%s)\n', fieldName, valueStr, specType);
+        % The - left alligns the values. the numbers control the width
+        % fprintf('  %-25s: %-25s (%s)\n', fieldName, valueStr, specType);
+
     end
-    
 
     % Display Flags
     fprintf('\nFlags:\n');
@@ -132,7 +135,7 @@ function printConfiguration(userParam, fullParam, userFlag, fullFlag, userOpt, O
             valueStr = '[non-displayable]';
         end
         
-        fprintf('  %-20s : %-15s (%s)\n', fieldName, valueStr, specType);
+        fprintf('  %25s: %-25s (%s)\n', fieldName, valueStr, specType);
     end
     
 
@@ -159,7 +162,7 @@ function printConfiguration(userParam, fullParam, userFlag, fullFlag, userOpt, O
             valueStr = '[non-displayable]';
         end
         
-        fprintf('  %-25s : %-25s (%s)\n', fieldName, valueStr, specType);
+        fprintf('  %25s: %-25s (%s)\n', fieldName, valueStr, specType);
     end
     
     fprintf('========================================\n\n');

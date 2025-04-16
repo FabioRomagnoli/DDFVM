@@ -1,4 +1,4 @@
-function [solution] = simulate(D, AD, Flag, Opt)
+function [solution] = simulation(D, AD, Flag, Opt)
     dt = AD.dt;
 
     file.Dati = D;
@@ -27,7 +27,7 @@ function [solution] = simulate(D, AD, Flag, Opt)
         else
             % otherwise just take the last  value of the solution 
             solution(:,1) = file.Res.ASol(:,end);
-            fprintf("\nLoaded initial point from simulation %s", Flag.loadSOl);
+            fprintf("\nLoaded initial point from simulation %s\n", Flag.loadSol);
         end
     else
         solution(:,1) = AD.x0;       % x0 serves as the prev time step and as inital guess
@@ -40,7 +40,7 @@ function [solution] = simulate(D, AD, Flag, Opt)
         t = AD.tsave(it-1);
         t1 = AD.tsave(it);
         [x1, dt] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt);
-        if dt <= AD.dtMin, fprintf("\n dt lower bound reached. Exiting..."); end      % avoids repetitive loop  
+        if dt <= AD.dtMin, fprintf("\n dt lower bound reached. Exiting..."); return; end      % avoids repetitive loop  
         if ~Flag.adaptive, dt = AD.dt; end              % edge case for t - t1 not divisible by dt
 
         % save solution
@@ -80,11 +80,11 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
         if isfield(info, 'exitflag') && info.exitflag == 0 && Flag.verbose, dt= dt*0.75; fprintf("\t Reducing dt\n\n"); continue; end
 
         if Flag.adaptive
-            if Flag.verbose, fprintf("\t2) dt/2: "); end   % + dt/2
+            if Flag.verbose, fprintf("2) dt/2: "); end   % + dt/2
             [xTemp, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt/2);
             if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
 
-            if Flag.verbose, fprintf("\t3) dt/2: "); end   % + dt/2
+            if Flag.verbose, fprintf("3) dt/2: "); end   % + dt/2
             [xTemp, info] = scheme(xTemp, BCs, AD, Flag, Opt, t+dt/2, dt/2);
             if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
     
@@ -109,7 +109,7 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
             end
         else % of adaptive if
             t = t + dt;
-            if Flag.verbose, fprintf('\n t = %g \t Vt = %g\n', t*AD.tbar, AD.Vt(t)*AD.Vbar); end
+            if Flag.verbose, fprintf('\t\t t = %-10g \t Vt = %g\n', t*AD.tbar, AD.Vt(t)*AD.Vbar); end
             x0(1) =  AD.Vt(t);
             x0(AD.intIdxs) = xNew;
         end

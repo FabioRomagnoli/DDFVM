@@ -43,7 +43,7 @@ function concentrationPlot(R, D, F)
         hold on;
         plot(D.r,pk, 'LineWidth', 1, "DisplayName", "p");
         plot(D.r,nk, 'LineWidth', 1, "DisplayName", "n");
-        plot(D.r,sqrt(nk.*pk), 'LineWidth',1, "DisplayName","$\sqrt{n+p}$");
+        % plot(D.r,sqrt(nk.*pk), 'LineWidth',1, "DisplayName","$\sqrt{n+p}$");
         hold off;
 
         % grid on; 

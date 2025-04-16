@@ -2,19 +2,18 @@ function [Param, Flag, Opt] = diodeCase3()
 
     % simulation settings
     Flag.model = "diode";
-    Flag.scheme = "coupled";
+    Flag.scheme = "split";
     Flag.verbose = true;
     Flag.method = "fsolve";         % "fsolve"/"newton"
     Flag.adaptive = true;        
     Flag.mesh = "linear";           % "linear"/"tanh"
-    Flag.saveSol = ".\diode\diodeCase3";
+    Flag.saveSol = ".\diode\diodeSplit";
         
     % plotting
     Flag.concentrationPlot = "last";    % Options: "all", "last", "none"
     Flag.potentialPlot = "last";
     Flag.currentPlot = "none";
     
-
 
     % Hyperparameters Diode
     Param = struct();
