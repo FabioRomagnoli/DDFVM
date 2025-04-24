@@ -1,42 +1,14 @@
-function [solution] = simulation(D, AD, Flag, Opt)
+function [Res] = simulation(D, AD, Flag, Opt, Res)
     dt = AD.dt;
 
     file.Dati = D;
     file.ADati = AD;
     file.Flag = Flag;
-    
-    % Load solution as starting point 
-    if ~strcmp(Flag.loadSol,"no")
-        load(fullfile(".\sim\", Flag.loadSol));
-        loadKf = length(file.Res.ASol(1,:));
-        % In case of resuming simulation handles the differences
-        if strcmp(Flag.loadSol,"checkpoint")  ... % is named checkpoint
-                && loadKf ~= file.Dati.K ... % it hasn't finished 
-                && file.Dati.K  == D.K && file.Dati.T == D.T % same simulation  time and K
-
-            D.K = D.K - loadKf;
-            AD.K = AD.K - loadKf;
-
-            D.T = D.T - D.tsave(loadKf);
-            AD.T = AD.T - AD.tsave(loadKf);
-
-            D.tsave = D.tsave(loadKf:end);
-            AD.tsave = AD.tsave(loadKf:end);
-            solution = file.Res.ASol;
-            fprintf("\nLoaded from checkpoint at time t = %g\n", D.tsave(1));
-        else
-            % otherwise just take the last  value of the solution 
-            solution(:,1) = file.Res.ASol(:,end);
-            fprintf("\nLoaded initial point from simulation %s\n", Flag.loadSol);
-        end
-    else
-        solution(:,1) = AD.x0;       % x0 serves as the prev time step and as inital guess
-    end
- 
+    file.Res = Res; 
 
     % actual computation of solution
     for it = 2 : numel(AD.tsave)      % Make sure that it executes exact times steps of tsave
-        x0 = solution(:,end);
+        x0 = Res.ASol(:,end);
         t = AD.tsave(it-1);
         t1 = AD.tsave(it);
         [x1, dt] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt);
@@ -44,12 +16,12 @@ function [solution] = simulation(D, AD, Flag, Opt)
         if ~Flag.adaptive, dt = AD.dt; end              % edge case for t - t1 not divisible by dt
 
         % save solution
-        fprintf("\nSaved solution n = %g, at time = %g\n", length(solution(1,:))+1, AD.tsave(it)*AD.tbar)
+        fprintf("\nSaved solution n = %g, at time = %g\n", length(Res.ASol(1,:))+1, AD.tsave(it)*AD.tbar)
         disp("-----------------------------------------------------")
-        solution(:,end+1) = x1;
+        Res.ASol(:,end+1) = x1;
 
         % Saves checkpoint
-        file.Res.ASol = solution;
+        file.Res.ASol = Res.ASol;
         save(fullfile(".\sim\", "checkpoint"), 'file');
 
         % to stop execution create a file "STOP_NOW.txt" in DDFVM folder

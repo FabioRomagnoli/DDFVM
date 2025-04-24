@@ -16,33 +16,82 @@ function [userParam, Dati, ADati, Flag, Results] = main(configName)
     Flag = setSimulationFlags(userFlag);
     Opt = setFsolveOptions(userOpt);
     
+
+
     % Initialize full parameters including defaults via initPlasma
     % Note that initPlasma fills in default values for parameters not specified by userParam.
-    switch Flag.model
-        case "diode"
-            [Param, Dati, ADati] = initDiode(userParam, Flag);
-        case "plasma"
-            [Param, Dati, ADati] = initPlasma(userParam, Flag);
+    if Flag.init
+        switch Flag.model
+            case "diode"
+                [Param, Dati, ADati] = initDiode(userParam, Flag);
+            case "plasma"
+                [Param, Dati, ADati] = initPlasma(userParam, Flag);
+        end
+
+        % Loads solution from file or starts the solution vector
+        if ~strcmp(Flag.loadSol,"no")
+            [Dati, ADati, Results] = loadFile(Dati, ADati, Flag);
+        else 
+            Results.ASol(:,1) = ADati.x0;       % x0 serves as the prev time step and as inital guess
+        end 
+
+        % Print complete configuration: parameters (user-specified vs. defaults), flags, and options
+        printConfiguration(userParam, Param, userFlag, Flag, userOpt, Opt);
+        input('Press Enter to continue...','s');
+    elseif ~Flag.init && ~strcmp(Flag.loadSol,"no") % Only for loading a solution and outputting
+        load(fullfile(".\sim\", Flag.loadSol));
+        fprintf("\nLoading solution: %s",Flag.loadSol);
+        Dati = file.Dati;
+        ADati = file.ADati;
+        Results = file.Res;
+    end
+        
+       
+    if Flag.solve
+        % Run the simulation and time it
+        tic;
+        Results = simulation(Dati, ADati, Flag, Opt, Results);
+        Results.elapsedTime = toc;
     end
 
-    % Print complete configuration: parameters (user-specified vs. defaults), flags, and options
-    printConfiguration(userParam, Param, userFlag, Flag, userOpt, Opt);
-        
-    input('Press Enter to continue...','s');
-
-    % Run the simulation and time it
-    tic;
-    Results.ASol = simulation(Dati, ADati, Flag, Opt);
-    Results.elapsedTime = toc;
-    
-    % Postprocessing of the results
-    Results = postProcess(Dati, ADati, Results, Flag);
+    if Flag.postProcess
+        % Postprocessing of the results
+        Results = postProcess(Dati, ADati, Results, Flag);
+    end
     
     % Plotting configuration can be adjusted in the config or by running
     % the function by itself an  modifying the flags needed
     plotter(Results, Dati, Flag);
 
 end
+
+
+function [D, AD, Res] = loadFile(D, AD, Flag)
+    load(fullfile(".\sim\", Flag.loadSol));
+    loadKf = length(file.Res.ASol(1,:));
+    % In case of resuming simulation handles the differences
+    if strcmp(Flag.loadSol,"checkpoint")  ... % is named checkpoint
+            && loadKf ~= file.Dati.K ... % it hasn't finished 
+            && file.Dati.K  == D.K && file.Dati.T == D.T % same simulation  time and K
+
+        D.K = D.K - loadKf;
+        AD.K = AD.K - loadKf;
+
+        D.T = D.T - D.tsave(loadKf);
+        AD.T = AD.T - AD.tsave(loadKf);
+
+        D.tsave = D.tsave(loadKf:end);
+        AD.tsave = AD.tsave(loadKf:end);
+        Res.ASol = file.Res.ASol;
+        fprintf("\nLoaded from checkpoint at time t = %g\n", D.tsave(1));
+    else
+        % otherwise just take the last  value of the solution 
+        Res = struct();
+        AD.x0 = file.Res.ASol(:,end);
+        fprintf("\nLoaded initial point from simulation %s\n", Flag.loadSol);
+    end
+end
+
 
 
 function Flag = setSimulationFlags(Flag)

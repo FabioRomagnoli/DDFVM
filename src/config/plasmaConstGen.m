@@ -20,7 +20,7 @@ function [Param, Flag, Opt] = plasmaConstGen()
     Flag.potentialPlot = "last";
     Flag.currentPlot = "last";
   
-    Flag.loadSol = "no";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
+    Flag.loadSol = "plasmaConstGen";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
     Flag.saveSol = "plasmaConstGen";              % "no"/"SaveName"                                                   (postProcess.m)
 
     % Hyperparameters

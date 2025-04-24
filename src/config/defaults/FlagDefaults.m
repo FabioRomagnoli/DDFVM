@@ -24,7 +24,11 @@ function def = FlagDefaults()
     def.loadSol = "no";         % Option for loading a previous solution: "no", "checkpoint", or a filename
     def.saveSol = "no";    
 
-
+    % STEPS
+    def.init = true;
+    def.solve = true;
+    def.postProcess = true;
+    
     % Plotting
     def.concentrationPlot = "none";    % Options: "all", "last", "none"
     def.potentialPlot = "none";

@@ -7,8 +7,9 @@ function [Param, Flag, Opt] = diodeCase2()
     Flag.method = "fsolve";         % "fsolve"/"newton"
     Flag.adaptive = true;        
     Flag.mesh = "linear";           % "linear"/"tanh"
-    Flag.saveSol = ".\diode\diodeCase2";
-        
+    % Flag.saveSol = ".\diode\diodeCase2";
+    Flag.saveSol = ".\checkpoint";
+
     % plotting
     Flag.concentrationPlot = "last";    % Options: "all", "last", "none"
     Flag.potentialPlot = "last";
