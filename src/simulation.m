@@ -24,6 +24,10 @@ function [solution] = simulation(D, AD, Flag, Opt)
             AD.tsave = AD.tsave(loadKf:end);
             solution = file.Res.ASol;
             fprintf("\nLoaded from checkpoint at time t = %g\n", D.tsave(1));
+        elseif loadKf  == file.Dati.K + 1   % Already completed just loadin
+            solution = file.Res.ASol;
+            fprintf("\nLoaded full Solution: %s\n",Flag.loadSol);
+            return
         else
             % otherwise just take the last  value of the solution 
             solution(:,1) = file.Res.ASol(:,end);

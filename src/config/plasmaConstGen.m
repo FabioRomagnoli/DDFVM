@@ -16,11 +16,11 @@ function [Param, Flag, Opt] = plasmaConstGen()
     Flag.alpha = "const";
 
     % plotting
-    Flag.concentrationPlot = "last";    % Options: "all", "last", "none"
+    Flag.concentrationPlot = "all";    % Options: "all", "last", "none"
     Flag.potentialPlot = "last";
     Flag.currentPlot = "last";
   
-    Flag.loadSol = "no";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
+    Flag.loadSol = "plasmaConstGen";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
     Flag.saveSol = "plasmaConstGen";              % "no"/"SaveName"                                                   (postProcess.m)
 
     % Hyperparameters
