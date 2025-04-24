@@ -15,14 +15,13 @@ function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
             [xSol, info] = solver(fun, xPrev, Opt, Flag, AD);
 
         case 'split'
-            fprintf("\n\t Transport: ")
-            funTrans = @(x) assemblerTransport(x, xPrev, BCs, AD, dt);
-            [xSol, info] = solver(funTrans, xPrev, Opt, Flag, AD);
-    
-    
             fprintf("\n\t Reaction: ")
-            funReact = @(x) assemblerDiodeReaction(x, xSol, BCs, AD, dt);
-            [xSol, info] = solver(funReact, xSol, Opt, Flag, AD);
+            funReact = @(x) assemblerDiodeReaction(x, xPrev, BCs, AD, dt);
+            [xSol, info] = solver(funReact, xPrev, Opt, Flag, AD);
+
+            fprintf("\n\t Transport: ")
+            funTrans = @(x) assemblerTransport(x, xSol, BCs, AD, dt);
+            [xSol, info] = solver(funTrans, xSol, Opt, Flag, AD);
             fprintf("\n\n")
         otherwise
             error('Unknown scheme: %s', Flag.scheme);

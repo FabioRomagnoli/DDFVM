@@ -15,9 +15,10 @@ function [F, jac]= assemblerDiodeReaction(x, x0, BCs,  AD, dt)
         zeri  zeri  M];
 
 
-    rhs = [zeros(lrr,1); M*n0 + dt*M*R; M*p0 + dt*M*R];
+    gen = [zeros(lrr,1); dt*M*R; dt*M*R];
+    rhs = [zeros(lrr,1); M*n0; M*p0];
     
-    F = NL*x - rhs + [zeros(lrr,1); -M*n0; -M*p0];
+    F = NL*x - gen - rhs;
 
     if nargout>1
         J11 = zeri;

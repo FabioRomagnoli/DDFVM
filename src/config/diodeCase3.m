@@ -7,12 +7,14 @@ function [Param, Flag, Opt] = diodeCase3()
     Flag.method = "fsolve";         % "fsolve"/"newton"
     Flag.adaptive = true;        
     Flag.mesh = "linear";           % "linear"/"tanh"
+
+    Flag.loadSol =  ".\diode\diodeCase3";
     Flag.saveSol = ".\diode\diodeCase3";
         
     % plotting
     Flag.concentrationPlot = "last";    % Options: "all", "last", "none"
     Flag.potentialPlot = "last";
-    Flag.currentPlot = "none";
+    Flag.currentPlot = "last";
     
 
 

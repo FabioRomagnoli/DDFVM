@@ -7,12 +7,13 @@ function [Param, Flag, Opt] = diodeCase3()
     Flag.method = "fsolve";         % "fsolve"/"newton"
     Flag.adaptive = true;        
     Flag.mesh = "linear";           % "linear"/"tanh"
+
     Flag.saveSol = ".\diode\diodeSplit";
         
     % plotting
     Flag.concentrationPlot = "last";    % Options: "all", "last", "none"
     Flag.potentialPlot = "last";
-    Flag.currentPlot = "none";
+    Flag.currentPlot = "last";
     
 
     % Hyperparameters Diode
@@ -25,7 +26,7 @@ function [Param, Flag, Opt] = diodeCase3()
     
     Param.stepBuffer = 0.8;
     Param.scalingPower = 0.3;
-    Param.dtMin = 1e-17;
+    Param.dtMin = 1e-19;
     Param.dtMax = 1e-2;
     
     % Fsolve flags
