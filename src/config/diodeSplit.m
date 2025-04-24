@@ -1,4 +1,4 @@
-function [Param, Flag, Opt] = diodeCase3()
+function [Param, Flag, Opt] = diodeSplit()
 
     % simulation settings
     Flag.model = "diode";

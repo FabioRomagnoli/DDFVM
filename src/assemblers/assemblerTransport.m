@@ -1,4 +1,4 @@
-function [F, jac]= assemblerTransport(x, x0, BCs, AD, dt)
+function [F, jac]= assemblerTransport(x, x0, BCs, AD, dt, Flag)
     % Unpack
     M = AD.M;
     A = AD.A;
@@ -43,7 +43,13 @@ function [F, jac]= assemblerTransport(x, x0, BCs, AD, dt)
 
     % system elements
     bounds = [A_bc*v_bc; dt*An_bc*n_bc; dt*Ap_bc*p_bc];
-    rhs = [M*AD.N(2:end-1); M*n0; M*p0];
+
+    switch lower(Flag.model)
+        case "diode"
+            rhs = [M*AD.N(2:end-1); M*n0; M*p0];
+        case "plasma"
+            rhs = [zeros(lrr,1);  M*n0  ; M*p0];
+    end
 
     % Build system
     F = NL*x  + bounds - rhs;

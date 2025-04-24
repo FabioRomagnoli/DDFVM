@@ -15,12 +15,19 @@ function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
             [xSol, info] = solver(fun, xPrev, Opt, Flag, AD);
 
         case 'split'
-            fprintf("\n\t Reaction: ")
-            funReact = @(x) assemblerDiodeReaction(x, xPrev, BCs, AD, dt);
+            fprintf("\n\t Reaction:\t")
+            switch lower(Flag.model)
+                case 'diode'
+                    funReact = @(x) assemblerDiodeReaction(x, xPrev, BCs, AD, dt);
+                case 'plasma'
+                    Opt.SpecifyObjectiveGradient = false;
+                    funReact = @(x) assemblerPlasmaReaction(x, xPrev, BCs, AD, dt);
+            end
             [xSol, info] = solver(funReact, xPrev, Opt, Flag, AD);
 
-            fprintf("\n\t Transport: ")
-            funTrans = @(x) assemblerTransport(x, xSol, BCs, AD, dt);
+            fprintf("\n\t Transport:\t ")
+            funTrans = @(x) assemblerTransport(x, xSol, BCs, AD, dt,Flag);
+            Opt.SpecifyObjectiveGradient = true;
             [xSol, info] = solver(funTrans, xSol, Opt, Flag, AD);
             fprintf("\n\n")
         otherwise
