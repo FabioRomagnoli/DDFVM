@@ -15,7 +15,7 @@ function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
             [xSol, info] = solver(fun, xPrev, Opt, Flag, AD);
 
         case 'split'
-            fprintf("\n\t Reaction:\t")
+            if Flag.verbose > 2; fprintf("\n\t Reaction:\t"); end
             switch lower(Flag.model)
                 case 'diode'
                     funReact = @(x) assemblerDiodeReaction(x, xPrev, BCs, AD, dt);
@@ -25,11 +25,11 @@ function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
             end
             [xSol, info] = solver(funReact, xPrev, Opt, Flag, AD);
 
-            fprintf("\n\t Transport:\t ")
+            if Flag.verbose > 2; fprintf("\n\t Transport:\t "); end
             funTrans = @(x) assemblerTransport(x, xSol, BCs, AD, dt,Flag);
             Opt.SpecifyObjectiveGradient = true;
             [xSol, info] = solver(funTrans, xSol, Opt, Flag, AD);
-            fprintf("\n\n")
+            if Flag.verbose > 2; fprintf("\n\n"); end
         otherwise
             error('Unknown scheme: %s', Flag.scheme);
     end
@@ -85,7 +85,7 @@ function [xNew, info] = solver(fun, x0, options,Flag,AD)
             error('Unknown method: %s', Flag.method);
     end
 
-   if Flag.verbose, solverOutput(info);   fprintf("\t"); end
+   if Flag.verbose > 2, solverOutput(info);   fprintf("\t"); end
 
 end
 

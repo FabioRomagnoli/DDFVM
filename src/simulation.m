@@ -79,26 +79,26 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
         x0r = x0(AD.intIdxs);        % reduced vector, solve  w/out BCs
         BCs =  x0(AD.bcsIdxs);       % BCs go in known RHS
 
-        if Flag.verbose, fprintf("\n1) dt: "); end         % + dt
+        if Flag.verbose >  1, fprintf("\n1) dt: "); end         % + dt
         [xNew, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt);
         if isfield(info, 'exitflag') && info.exitflag == 0 && Flag.verbose, dt= dt*0.75; fprintf("\t Reducing dt\n\n"); continue; end
 
         if Flag.adaptive
-            if Flag.verbose, fprintf("2) dt/2: "); end   % + dt/2
+            if Flag.verbose > 1, fprintf("2) dt/2: "); end   % + dt/2
             [xTemp, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt/2);
             if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
 
-            if Flag.verbose, fprintf("3) dt/2: "); end   % + dt/2
+            if Flag.verbose > 1, fprintf("3) dt/2: "); end   % + dt/2
             [xTemp, info] = scheme(xTemp, BCs, AD, Flag, Opt, t+dt/2, dt/2);
             if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
     
             relativeError = computeRelErrors(xNew, xTemp, AD, Flag);
             timeScaling = max(0.5, min(1.3, AD.stepBuffer * (AD.tolError / relativeError)^AD.scalingPower));
-            if Flag.verbose, fprintf('\n  t =%12.4e \t  dt =%12.4e, \t Vt = %12.6e \t scale = %g', t*AD.tbar, dt*AD.tbar, AD.Vt(t+dt)*AD.Vbar, timeScaling); end
+            if Flag.verbose > 1, fprintf('\n  t =%12.4e \t  dt =%12.4e, \t Vt = %12.6e \t scale = %g', t*AD.tbar, dt*AD.tbar, AD.Vt(t+dt)*AD.Vbar, timeScaling); end
             dtNew = dt * timeScaling;
             if relativeError < AD.tolError
                     t = t + dt;
-                    if Flag.verbose, fprintf("\n(+) Step accepted\n\n"); end
+                    if Flag.verbose > 1, fprintf("\n(+) Step accepted\n\n"); end
 
                     % Update boundary and interior solution
                     x0(1) = AD.Vt(t);           % Update boundary condition
@@ -108,12 +108,12 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
                     dt = min(dtNew, AD.dtMax);
             else
                     if dt <= AD.dtMin, return; end      % avoids repetitive loop  
-                    if Flag.verbose, fprintf("\n(-) Step rejected\n\n"); end
+                    if Flag.verbose > 1, fprintf("\n(-) Step rejected\n\n"); end
                     dt = max(dtNew, AD.dtMin);
             end
         else % of adaptive if
             t = t + dt;
-            if Flag.verbose, fprintf('\t\t t = %-10g \t Vt = %g\n', t*AD.tbar, AD.Vt(t)*AD.Vbar); end
+            if Flag.verbose > 1, fprintf('\t\t t = %-10g \t Vt = %g\n', t*AD.tbar, AD.Vt(t)*AD.Vbar); end
             x0(1) =  AD.Vt(t);
             x0(AD.intIdxs) = xNew;
         end
@@ -127,5 +127,5 @@ function relativeError = computeRelErrors(xNew, xTemp, AD, Flag)
     relErrN = norm(xNew(AD.nIR) - xTemp(AD.nIR)) / max(norm(xTemp(AD.nIR)), eps);
     relErrP = norm(xNew(AD.pIR) - xTemp(AD.pIR)) / max(norm(xTemp(AD.pIR)), eps);
     relativeError = relErrV + relErrN + relErrP;
-    if Flag.verbose, fprintf("\n||X||=%12.4e \t ||V||=%12.4e \t ||N||=%12.4e \t ||P||=%12.4e",  relativeError, relErrV,relErrN,relErrP); end
+    if Flag.verbose > 1, fprintf("\n||X||=%12.4e \t ||V||=%12.4e \t ||N||=%12.4e \t ||P||=%12.4e",  relativeError, relErrV,relErrN,relErrP); end
 end 
