@@ -30,7 +30,7 @@ function [Param, Flag, Opt] = plasmaSplit()
     Param.dt = 1e-4;                 % Time separation [s]
     Param.T = 100;                   % Total simulation time [s]
     Param.V0 = 0;                    % Voltage at r=1 and t=1 [V]
-    Param.tolError = 1e-2;          % Adaptive time stepping tollerance
+    Param.tolError = 1e-3;          % Adaptive time stepping tollerance
 
     Param.mup = 1.86e-4;             % Mobility for positive species
     Param.mun = 5e-2;                % Mobility for negative species

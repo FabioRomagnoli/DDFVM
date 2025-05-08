@@ -1,5 +1,6 @@
 function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
 % handles the coupled or splitting scheme
+    BCs(1) = AD.Vt(t+dt);
     switch lower(Flag.scheme)
         case 'coupled'
             % returns the correct function depending of the chosen problem
@@ -37,7 +38,6 @@ end
 
 
 function fun = pickAssembler(xPrev, BCs,  AD, t, dt, Flag)
-    BCs(1) = AD.Vt(t+dt);
     switch lower(Flag.model)
         case 'diode'
             % Simple diode system (jacobian exists)
