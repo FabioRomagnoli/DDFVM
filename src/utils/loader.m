@@ -2,19 +2,19 @@ clear all
 
 % PLASMA CASES
 % loadSol = "plasmaConstGen.mat";               % constant generation term in ion zone
-% loadSol = "plasmaConstAlpha.mat";             % somehow ran to the end with const alpha but very wrong current
+% loadSol = "plasmaConstAlpha.mat";             % very short sim time with const alpha but very wrong current
 % loadSol = "alphaExpBeta3e5.full.mat";         % with beta found through const gen term comparison
-% loadSol = "alphaExpBeta7e5.ful.mat";          % 1.61490e-04  first result that worked beta value from papers
-% loadSol = "alphaExpBeta7e5newMu.full.mat";    % 1.608e-04, params (beta, Ei, mu) taken from papers,  51  cells, 2 sec
-% loadSol = "alphaExpBeta7e5-100sec.mat";       % 1.60822e-04  100 sec 
-% loadSol = "alphaExpBeta7e5cells101.mat";      % 1.36e-04 100 cells worst reslts
+% loadSol = "alphaExpBeta7e5.full.mat";         % 1.614e-04  first result that worked beta value from papers
+% loadSol = "alphaExpBeta7e5newMu.full.mat";    % 1.608e-04, params mu taken from papers 2 sec
+% loadSol = "alphaExpBeta7e5-100sec.mat";       % 1.608e-04  100 sec 
+% loadSol = "alphaExpBeta7e5cells101.mat";      % 1.360e-04 100 cells worst reslts
 
 
 % DIODE CASES
-% loadSol = "diode\diodeCase1.mat"
-% loadSol = "diode\diodeCase2.mat"
-% loadSol = "diode\diodeCase3.mat"
-% loadSol = "diode\diodeSplit.mat"
+% loadSol = "diode\diodeCase1.mat";
+% loadSol = "diode\diodeCase2.mat";
+% loadSol = "diode\diodeCase3.mat";
+% loadSol = "diode\diodeSplit.mat";
 
 
 % LOAD SOLUTION AND DEF PARAMETERS
