@@ -1,4 +1,4 @@
-function Res = postProcess(D, AD, Res, Flag)
+function Res = postProcess(D, AD, Res, Flag, Param)
     Res = redim(D,AD,Res);
 
     % computes the final current if steady
@@ -8,7 +8,7 @@ function Res = postProcess(D, AD, Res, Flag)
         Res = computeAlpha(D, Res, Flag);
     end
 
-    saveFile(D, AD, Res, Flag)
+    saveFile(D, AD, Res, Flag, Param)
 end
 
 
@@ -85,12 +85,13 @@ function Res = computeAlpha(D, Res, Flag)
 end
 
 
-function saveFile(D, AD, Res, Flag)
+function saveFile(D, AD, Res, Flag, Param)
     if ~strcmp(Flag.saveSol,"no")
         file.Res = Res;
         file.Dati = D;
         file.ADati = AD;
         file.Flag = Flag;
+        file.Param = Param;
         save(fullfile(".\sim\", Flag.saveSol), 'file');
         fprintf("\nSaved Solution to %s.m \n",Flag.saveSol);
     end
