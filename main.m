@@ -38,8 +38,7 @@ function [userParam, Dati, ADati, Flag, Results] = main(configName)
     % Postprocessing of the results
     Results = postProcess(Dati, ADati, Results, Flag, Param);
     
-    % Plotting configuration can be adjusted in the config or by running
-    % the function by itself an  modifying the flags needed
+    % Plotting configuration 
     plotter(Results, Dati, Flag);
 
 end

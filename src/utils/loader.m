@@ -8,6 +8,7 @@ clear all
 % loadSol = "alphaExpBeta7e5newMu.full.mat";    % 1.608e-04, params mu taken from papers 2 sec
 % loadSol = "alphaExpBeta7e5-100sec.mat";       % 1.608e-04  100 sec 
 % loadSol = "alphaExpBeta7e5cells101.mat";      % 1.360e-04 100 cells worst reslts
+loadSol = "alphaExpBeta50kV.mat";      
 
 
 % DIODE CASES
@@ -24,17 +25,13 @@ fprintf("\nLoaded Solution %s\n",loadSol);
 % OUTPUT CONFIGURATON
 printConfiguration(struct(),file.Param,struct(),file.Flag,struct(),struct());
 
-% POST PROCESSING IF NECESSARY
-file.Flag.saveSol = "no";       % IMPORTANT IT REMAINS "no"
-file.Flag.compAlpha = false;
-file.Flag.alpha = "const";  % "const"/"exp"
-Res = postProcess(file.Dati, file.ADati, file.Res, file.Flag, file.Param);
-
-
 % PLOTTING
 file.Flag.concentrationPlot = "none";    % "all"/"last"/"none"
 file.Flag.potentialPlot = "none";
-file.Flag.currentPlot = "none";
+file.Flag.currentPlot = "reduced";
 file.Flag.generationPlot = "none";
+file.Flag.experimentalCurrentPotentialPlot = "Y";
+
 
 plotter(file.Res,file.Dati,file.Flag);
+

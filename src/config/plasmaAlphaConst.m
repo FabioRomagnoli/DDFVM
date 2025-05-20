@@ -1,4 +1,4 @@
-function [Param, Flag, Opt] = plasmaAlphaConst()
+1function [Param, Flag, Opt] = plasmaAlphaConst()
     % JACOBIAN DOESN'T WORK FOR THIS YET
     % This does start running but suuper slow
     

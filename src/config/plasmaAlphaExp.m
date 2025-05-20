@@ -1,4 +1,5 @@
 function [Param, Flag, Opt] = plasmaAlphaExp()
+
     % Simulation settings
     Flag.model = "plasma";               % Model selection
     Flag.verbose = true;

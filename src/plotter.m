@@ -1,25 +1,27 @@
-function plotter(R, D, F)  
+function plotter(Res, Dati, Flag)  
     % Concentration of each species
-    concentrationPlot(R, D, F);
+    concentrationPlot(Res, Dati, Flag);
 
     % Potential V
-    potentialPlot(R, D, F);
+    potentialPlot(Res, Dati, Flag);
 
     % Electrical  current J
-    currentPlot(R, D, F);
+    currentPlot(Res, Dati, Flag);
 
     % comparison of rhs generation, prev used for debugging plasma
-    generationPlot(R,D,F);
+    generationPlot(Res,Dati,Flag);
+
+    experimentalCurrentPotentialPlot(Res,Dati,Flag);
 end
 
 
-function concentrationPlot(R, D, F)
-    if isfield(F, 'concentrationPlot')
-        switch F.concentrationPlot
+function concentrationPlot(Res, Dati, Flag)
+    if isfield(Flag, 'concentrationPlot')
+        switch Flag.concentrationPlot
             case "none"
                 return
             case "last"
-                ks = R.kf;
+                ks = Res.kf;
                 skip = 1;
             case "all"
                 ks = 1;
@@ -33,24 +35,24 @@ function concentrationPlot(R, D, F)
     end
 
     figure;
-    for k=ks:skip:R.kf
-        vk = R.Sol(D.vIdxs,k);
-        nk = R.Sol(D.nIdxs,k);
-        pk = R.Sol(D.pIdxs,k);
+    for k=ks:skip:Res.kf
+        vk = Res.Sol(Dati.vIdxs,k);
+        nk = Res.Sol(Dati.nIdxs,k);
+        pk = Res.Sol(Dati.pIdxs,k);
 
         clf; % Clear figure before plotting new data
         title(['Electron and hole concentrations at V = ', num2str(vk(1))]);
         hold on;
-        plot(D.r,pk, 'LineWidth', 1, "DisplayName", "p");
-        plot(D.r,nk, 'LineWidth', 1, "DisplayName", "n");
-        % plot(D.r,sqrt(nk.*pk), 'LineWidth',1, "DisplayName","$\sqrt{n+p}$");
+        plot(Dati.r,pk, 'LineWidth', 1, "DisplayName", "p");
+        plot(Dati.r,nk, 'LineWidth', 1, "DisplayName", "n");
+        % plot(Dati.r,sqrt(nk.*pk), 'LineWidth',1, "DisplayName","$\sqrt{n+p}$");
         hold off;
 
         % grid on; 
         legend('Interpreter', 'latex');        
         set(gca, 'YScale', 'log')
-        set(gca, 'XScale', 'log')
-
+        % set(gca, 'XScale', 'log')
+        % axis([Dati.r0,Dati.r1,1e7,1e15])
         xlabel('Position (m)');           % x-axis label
         ylabel('Concentration (m^{-3})'); % y-axis label
 
@@ -59,13 +61,13 @@ function concentrationPlot(R, D, F)
     end
 end
 
-function potentialPlot(R, D, F)
-    if isfield(F, 'potentialPlot')
-        switch F.potentialPlot
+function potentialPlot(Res, Dati, Flag)
+    if isfield(Flag, 'potentialPlot')
+        switch Flag.potentialPlot
             case "none"
                 return
             case "last"
-                ks = R.kf;
+                ks = Res.kf;
                 skip = 1;
             case "all"
                 ks = 1;
@@ -80,12 +82,12 @@ function potentialPlot(R, D, F)
 
     figure;
     title('Electric potential')
-    for k = ks:skip:R.kf
+    for k = ks:skip:Res.kf
 
         clf; % Clear figure before plotting new data
-        vk = R.Sol(D.vIdxs, k);
+        vk = Res.Sol(Dati.vIdxs, k);
         
-        plot(D.r, vk, 'LineWidth', 1, "DisplayName", "v");
+        plot(Dati.r, vk, 'LineWidth', 1, "DisplayName", "v");
         
         grid on;
         legend();
@@ -97,13 +99,13 @@ function potentialPlot(R, D, F)
     end
 end
     
-function currentPlot(R, D, F)
-    if isfield(F, 'currentPlot')
-        switch F.currentPlot
+function currentPlot(Res, Dati, Flag)
+    if isfield(Flag, 'currentPlot')
+        switch Flag.currentPlot
             case "none"
                 return
             case "last"
-                ks = R.kf;
+                ks = Res.kf;
                 skip = 1;
             case "all"
                 ks = 1;
@@ -112,7 +114,7 @@ function currentPlot(R, D, F)
                 ks = 1;
                 skip = 10;
             case "lastFew"
-                ks = R.kf - 100;
+                ks = Res.kf - 100;
                 skip = 1;
         end    
     else
@@ -121,22 +123,22 @@ function currentPlot(R, D, F)
 
     figure;
 
-    rhalf = (D.r(1:end-1) + D.r(2:end))/2;
-    for k=ks:skip:R.kf
+    rhalf = (Dati.r(1:end-1) + Dati.r(2:end))/2;
+    for k=ks:skip:Res.kf
 
-        vk = R.Sol(D.vIdxs,k);
-        nk = R.Sol(D.nIdxs,k);
-        pk = R.Sol(D.pIdxs,k);
+        vk = Res.Sol(Dati.vIdxs,k);
+        nk = Res.Sol(Dati.nIdxs,k);
+        pk = Res.Sol(Dati.pIdxs,k);
 
         % Compute bimu bernulli only once
-        [Bp, Bn] = bimu_bernoulli (diff(vk) / D.Vth);
+        [Bp, Bn] = bimu_bernoulli (diff(vk) / Dati.Vth);
 
         clf; % Clear figure before plotting new data
-        title(['Current at V = ', num2str(vk(1))]);
 
-        Jn = 2*pi*D.q*comp_current(D.r,D.mun,D.Vth,-1,nk, Bn, Bp);
-        Jp = 2*pi*D.q*comp_current(D.r,D.mup,D.Vth, 1,pk, Bp, Bn);
+        Jn = 2*pi*Dati.q*comp_current(Dati.r,Dati.mun,Dati.Vth,-1,nk, Bn, Bp);
+        Jp = 2*pi*Dati.q*comp_current(Dati.r,Dati.mup,Dati.Vth, 1,pk, Bp, Bn);
         JJ = Jn + Jp;
+        title(['Current at V = ', num2str(vk(1))]);
 
         hold on;
         plot(rhalf,Jn, 'LineWidth', 1, "DisplayName","Jn");
@@ -153,25 +155,25 @@ function currentPlot(R, D, F)
     
 end
 
-function generationPlot(R, D, F)
-    if ~isfield(F, 'generationPlot'), return; end
-    if F.generationPlot == "none", return; end
+function generationPlot(Res, Dati, Flag)
+    if ~isfield(Flag, 'generationPlot'), return; end
+    if Flag.generationPlot == "none", return; end
 
     % Compute bimu_bernulli
-    [Bp, Bn] = bimu_bernoulli (diff(R.Sol(D.vIdxs,end)) / D.Vth);
+    [Bp, Bn] = bimu_bernoulli (diff(Res.Sol(Dati.vIdxs,end)) / Dati.Vth);
 
     % With matrix
-    Ar = ax_gen(D.r, D.mun, R.alpha, D.Vth, -1, Bn, Bp);
+    Ar = ax_gen(Dati.r, Dati.mun, Res.alpha, Dati.Vth, -1, Bn, Bp);
     
     % generation term
-    dr = diff(D.r);
-    Jn = comp_current(D.r,D.mun,D.Vth,-1,R.Sol(D.nIdxs,end),Bn, Bp);
+    dr = diff(Dati.r);
+    Jn = comp_current(Dati.r,Dati.mun,Dati.Vth,-1,Res.Sol(Dati.nIdxs,end),Bn, Bp);
 
     % Alpha term
-    if strcmp(F.alpha,"const")
+    if strcmp(Flag.alpha,"const")
         alphalow = dr/2; alphahigh = dr/2;
-    elseif strcmp(F.alpha,"exp")
-        [alphalow, alphahigh] = alpha_exp(D.r, R.Sol(D.vIdxs,end), D.Ei, R.beta);
+    elseif strcmp(Flag.alpha,"exp")
+        [alphalow, alphahigh] = alpha_exp(Dati.r, Res.Sol(Dati.vIdxs,end), Dati.Ei, Res.beta);
     end
     
     RHS = abs(([0; alphalow.*Jn]+[alphahigh.*Jn; 0]));
@@ -181,17 +183,50 @@ function generationPlot(R, D, F)
 
     hold on; 
     
-    plot(D.r, RHS,"b-o", 'DisplayName', 'Jn [1/m^2*s]');
+    plot(Dati.r, RHS,"b-o", 'DisplayName', 'Jn [1/m^2*s]');
 
-    plot(D.r, R.genInt, "k-s", 'DisplayName', 'Const Gen');
+    plot(Dati.r, Res.genInt, "k-s", 'DisplayName', 'Const Gen');
 
-    plot(D.r, Ar*R.Sol(D.nIdxs,end),"-*",'DisplayName', 'Matrix' );    
+    plot(Dati.r, Ar*Res.Sol(Dati.nIdxs,end),"-*",'DisplayName', 'Matrix' );    
     hold off;
 
     grid on;
     set(gca, 'YScale', 'log') % Change y-axis to log scale
     set(gca, 'XScale', 'log') % Change y-axis to log scale
-    xlim([D.r0 D.r0+D.ionLength]);
+    % xlim([Dati.r0 Dati.r0+Dati.ionLength]);
+    legend('Location', 'best'); 
+    ylabel("RHS [1/(ms)]");
+
+end
+
+
+
+function experimentalCurrentPotentialPlot(Res, Dati, Flag)
+    if ~isfield(Flag, 'experimentalCurrentPotentialPlot'), return; end
+    if Flag.experimentalCurrentPotentialPlot == "none", return; end
+
+
+    dataPlourabu =  csvread("dati_esperimento_zheng\xx_PlourabuèData.csv");
+    dataPlourabu(all(dataPlourabu == 0, 2), :) = [];  % removes rows where both elements are zero
+
+    figure()
+    title('Applied Voltage vs measured Current plot')
+
+    hold on; 
+
+    plot(Res.Sol(1,:),Res.JJv(:,1), "b", 'DisplayName', 'Simulation');
+
+    plot(dataPlourabu(:,1)*1e3,dataPlourabu(:,2)*1e-3,"k-s", 'DisplayName', 'Experimental')
+
+    hold off;
+
+    grid on;
+    % set(gca, 'YScale', 'log') % Change y-axis to log scale
+    % set(gca, 'XScale', 'log') % Change y-axis to log scale
+
+    xlim([2e4 3.5e4]);
+    ylim([0 2e-4]);
+
     legend('Location', 'best'); 
     ylabel("RHS [1/(ms)]");
 

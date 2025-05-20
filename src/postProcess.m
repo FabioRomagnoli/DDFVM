@@ -8,11 +8,17 @@ function Res = postProcess(D, AD, Res, Flag, Param)
         Res = computeAlpha(D, Res, Flag);
     end
 
+    if  Flag.computeCurrents
+        Res = computeCurrents(D,Res);
+    end
+    
     saveFile(D, AD, Res, Flag, Param)
 end
 
 
 function Res = redim(D,AD,Res)
+    fprintf("\nRedimensionalized");
+
     % Redimensionalize solution 
     v = Res.ASol(D.vIdxs,:)*AD.Vbar;
     n = Res.ASol(D.nIdxs,:)*AD.nbar;
@@ -44,6 +50,28 @@ function Res = finalCurrent(D, Res, Flag)
         fprintf('\nJJ is not constant.');
     end
 end
+
+
+function Res = computeCurrents(D,Res)
+    fprintf("\nComputed currents at every time step");
+
+    JJv = zeros(Res.kf,1);
+    for k=1:Res.kf
+        vk = Res.Sol(D.vIdxs,k);
+        nk = Res.Sol(D.nIdxs,k);
+        pk = Res.Sol(D.pIdxs,k);
+    
+        % Compute bimu bernulli only once
+        [Bp, Bn] = bimu_bernoulli (diff(vk) / D.Vth);
+    
+        Jn = 2*pi*D.q*comp_current(D.r,D.mun,D.Vth,-1,nk, Bn, Bp);
+        Jp = 2*pi*D.q*comp_current(D.r,D.mup,D.Vth, 1,pk, Bp, Bn);
+        JJv(k) = mean(Jn + Jp);
+    end
+
+    Res.JJv = JJv;
+end
+
 
 
 function Res = computeAlpha(D, Res, Flag)

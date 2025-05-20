@@ -24,10 +24,10 @@ function [solution] = simulation(D, AD, Flag, Opt)
             AD.tsave = AD.tsave(loadKf:end);
             solution = file.Res.ASol;
             fprintf("\nLoaded from checkpoint at time t = %g\n", D.tsave(1));
-        elseif loadKf  == file.Dati.K + 1   % Already completed just loadin
-            solution = file.Res.ASol;
-            fprintf("\nLoaded full Solution: %s\n",Flag.loadSol);
-            return
+        % elseif loadKf  == file.Dati.K + 1   % Already completed just loadin
+        %     solution = file.Res.ASol;
+        %     fprintf("\nLoaded full Solution: %s\n",Flag.loadSol);
+        %     return
         else
             % otherwise just take the last  value of the solution 
             solution(:,1) = file.Res.ASol(:,end);
@@ -81,7 +81,7 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
 
         if Flag.verbose >  1, fprintf("\n1) dt: "); end         % + dt
         [xNew, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt);
-        if isfield(info, 'exitflag') && info.exitflag == 0 && Flag.verbose, dt= dt*0.75; fprintf("\t Reducing dt\n\n"); continue; end
+        if isfield(info, 'exitflag') && info.exitflag == 0 && Flag.verbose, dt= dt*0.75; fprintf("\t Reducing dt to %g \n\n", dt); continue; end
 
         if Flag.adaptive
             if Flag.verbose > 1, fprintf("2) dt/2: "); end   % + dt/2
