@@ -81,6 +81,7 @@ function Dati = datiDiode(Param, Flag)
         p0 = (-Dati.N + sqrt(Dati.N.^2 + 4*Dati.ni^2))/2;
         p0(Dati.N > 0) = Dati.ni^2 ./ n0(Dati.N > 0); % Capire perché è necessario, forse è solo un problema di approx numerica, infatti N^2 è molto maggiore di ni^2
         n0(Dati.N < 0) = Dati.ni^2 ./ p0(Dati.N < 0);
+    
     elseif Param.case == 5
         Na = 1e24; % [1/m^3] - P-side (inner part)
         Nd = 1e22; % [1/m^3] - N-side (outer part)
@@ -97,7 +98,12 @@ function Dati = datiDiode(Param, Flag)
         % Ensure numerical stability in high doping regions
         p0(Dati.N > 0) = Dati.ni^2 ./ n0(Dati.N > 0); % N-side
         n0(Dati.N < 0) = Dati.ni^2 ./ p0(Dati.N < 0); % P-side
+    elseif Param.case == 6
+        %....
     end
+
+
+
 
     % solving for v0 inside domain 
     F = ax_laplacian (Dati.r, 1);    % Perché cambia il valore del residuo (quello restituito da fsolve) in base a se metto 1 o epsilon? l'rhs è 0!

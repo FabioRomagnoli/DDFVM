@@ -11,7 +11,13 @@ function plotter(Res, Dati, Flag)
     % comparison of rhs generation, prev used for debugging plasma
     generationPlot(Res,Dati,Flag);
 
+    characteristicCurvePlot(Res,Dati,Flag);
+
     experimentalCurrentPotentialPlot(Res,Dati,Flag);
+
+    experimentalConcentrationPositiveIonPlot(Res,Dati,Flag);
+
+    experimentalPotentialPlot(Res,Dati,Flag);
 end
 
 
@@ -200,7 +206,6 @@ function generationPlot(Res, Dati, Flag)
 end
 
 
-
 function experimentalCurrentPotentialPlot(Res, Dati, Flag)
     if ~isfield(Flag, 'experimentalCurrentPotentialPlot'), return; end
     if Flag.experimentalCurrentPotentialPlot == "none", return; end
@@ -231,3 +236,86 @@ function experimentalCurrentPotentialPlot(Res, Dati, Flag)
     % ylabel("RHS [1/(ms)]");
 
 end
+
+
+function characteristicCurvePlot(Res, Dati, Flag)
+    if ~isfield(Flag, 'characteristicCurvePlot'), return; end
+    if Flag.characteristicCurvePlot == "none", return; end
+
+
+
+    figure()
+    title('Applied Voltage vs measured Current plot')
+    hold on; 
+    plot(Res.Sol(1,:) - Res.Sol(Dati.lr,:),Res.JJv(:,1), "b", 'DisplayName', 'Simulation');
+    hold off;
+
+
+    grid on;
+    % set(gca, 'YScale', 'log') % Change y-axis to log scale
+    % set(gca, 'XScale', 'log') % Change y-axis to log scale
+
+    % xlim([2e4 3.5e4]);
+    % ylim([0 2e-4]);
+
+    legend('Location', 'best'); 
+    % ylabel("RHS [1/(ms)]");
+
+end
+
+
+function experimentalConcentrationPositiveIonPlot(Res, Dati, Flag)
+    if ~isfield(Flag, 'experimentalConcentrationPositiveIonPlot'), return; end
+    if Flag.experimentalConcentrationPositiveIonPlot == "none", return; end
+
+    dataPositiveIon =  csvread("dati_esperimento_zheng\positive.csv");
+    dataNodes =  csvread("dati_esperimento_zheng\nodes.csv");
+
+    pend = Res.Sol(Dati.pIdxs,end);
+
+    figure()
+    hold on; 
+    xline(Dati.r0 + Dati.ionLength, 'r', 'LineWidth', 1); % red dashed line, width 1.5
+    plot(Dati.r,pend, 'LineWidth', 1, "DisplayName", "p");
+    plot(dataNodes, dataPositiveIon(end,:),'LineWidth', 1, "DisplayName", "experimental");
+    hold off;
+
+    grid on;
+    % set(gca, 'YScale', 'log') % Change y-axis to log scale
+    % set(gca, 'XScale', 'log') % Change y-axis to log scale
+
+    % xlim([2e4 3.5e4]);
+    % ylim([0 2e-4]);
+
+    legend('Location', 'best'); 
+    % ylabel("RHS [1/(ms)]");
+end
+
+
+
+function experimentalPotentialPlot(Res, Dati, Flag)
+    if ~isfield(Flag, 'experimentalPotentialPlot'), return; end
+    if Flag.experimentalPotentialPlot == "none", return; end
+
+    dataPotential =  csvread("dati_esperimento_zheng\potential.csv");
+    dataNodes =  csvread("dati_esperimento_zheng\nodes.csv");
+
+    vend = Res.Sol(Dati.vIdxs,end);
+
+    figure()
+    hold on; 
+    plot(Dati.r,vend, 'LineWidth', 1, "DisplayName", "v");
+    plot(dataNodes, dataPotential(end,:),'LineWidth', 1, "DisplayName", "experimental");
+    hold off;
+
+    grid on;
+    % set(gca, 'YScale', 'log') % Change y-axis to log scale
+    % set(gca, 'XScale', 'log') % Change y-axis to log scale
+
+    % xlim([2e4 3.5e4]);
+    % ylim([0 2e-4]);
+
+    legend('Location', 'best'); 
+    % ylabel("RHS [1/(ms)]");
+end
+
