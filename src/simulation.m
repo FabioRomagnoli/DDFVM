@@ -7,12 +7,12 @@ function [solution] = simulation(D, AD, Flag, Opt)
     
     % Load solution as starting point 
     if ~strcmp(Flag.loadSol,"no")
-        load(fullfile(".\sim\", Flag.loadSol));
-        loadKf = length(file.Res.ASol(1,:));
+        loadedFile = load(fullfile(".\sim\", Flag.loadSol)).file;
+        loadKf = length(loadedFile.Res.ASol(1,:));
         % In case of resuming simulation handles the differences
         if strcmp(Flag.loadSol,"checkpoint")  ... % is named checkpoint
-                && loadKf ~= file.Dati.K ... % it hasn't finished 
-                && file.Dati.K  == D.K && file.Dati.T == D.T % same simulation  time and K
+                && loadKf ~= loadedFile.Dati.K ... % it hasn't finished 
+                && loadedFile.Dati.K  == D.K && loadedFile.Dati.T == D.T % same simulation  time and K
 
             D.K = D.K - loadKf;
             AD.K = AD.K - loadKf;
@@ -22,15 +22,16 @@ function [solution] = simulation(D, AD, Flag, Opt)
 
             D.tsave = D.tsave(loadKf:end);
             AD.tsave = AD.tsave(loadKf:end);
-            solution = file.Res.ASol;
+            solution = loadedFile.Res.ASol;
             fprintf("\nLoaded from checkpoint at time t = %g\n", D.tsave(1));
         % elseif loadKf  == file.Dati.K + 1   % Already completed just loadin
         %     solution = file.Res.ASol;
         %     fprintf("\nLoaded full Solution: %s\n",Flag.loadSol);
         %     return
         else
-            % otherwise just take the last  value of the solution 
-            solution(:,1) = file.Res.ASol(:,end);
+            % otherwise just take the last  value of the solution properly
+            % adimensionalized
+            solution(:,1) = loadedFile.Res.Sol(:,end) ./ AD.xBarVec;
             fprintf("\nLoaded initial point from simulation %s\n", Flag.loadSol);
         end
     else
@@ -94,7 +95,7 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
     
             relativeError = computeRelErrors(xNew, xTemp, AD, Flag);
             timeScaling = max(0.5, min(1.3, AD.stepBuffer * (AD.tolError / relativeError)^AD.scalingPower));
-            if Flag.verbose > 1, fprintf('\n  t =%12.4e \t  dt =%12.4e, \t Vt = %12.6e \t scale = %g', t*AD.tbar, dt*AD.tbar, AD.Vt(t+dt)*AD.Vbar, timeScaling); end
+            if Flag.verbose > 1, fprintf('\n  t =%12.4e \t  dt =%12.4e, \t Vt = %12.6e \t EndVt = %12.6e \t scale = %g', t*AD.tbar, dt*AD.tbar, AD.Vt(t+dt)*AD.Vbar, AD.EndVt(t+dt)*AD.Vbar,  timeScaling); end
             dtNew = dt * timeScaling;
             if relativeError < AD.tolError
                     t = t + dt;
@@ -113,8 +114,9 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
             end
         else % of adaptive if
             t = t + dt;
-            if Flag.verbose > 1, fprintf('\t\t t = %-10g \t Vt = %g\n', t*AD.tbar, AD.Vt(t)*AD.Vbar); end
+            if Flag.verbose > 1, fprintf('\t\t t = %-10g \t Vt = %g \t EndVt = %g \n', t*AD.tbar, AD.Vt(t)*AD.Vbar, AD.EndVt(t)*AD.Vbar); end
             x0(1) =  AD.Vt(t);
+            x0(AD.lr) =  AD.EndVt(t);
             x0(AD.intIdxs) = xNew;
         end
     end

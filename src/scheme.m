@@ -1,6 +1,8 @@
 function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
 % handles the coupled or splitting scheme
     BCs(1) = AD.Vt(t+dt);
+    BCs(2) = AD.EndVt(t+dt);
+    
     switch lower(Flag.scheme)
         case 'coupled'
             % returns the correct function depending of the chosen problem

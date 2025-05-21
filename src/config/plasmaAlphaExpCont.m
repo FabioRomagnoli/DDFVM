@@ -18,7 +18,7 @@ function [Param, Flag, Opt] = plasmaAlphaExp()
     Flag.VT = "plateu";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
     
     Flag.loadSol = "alphaExpBeta7e5-100sec";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
-    Flag.saveSol = "alphaExpBeta50kV";              % "no"/"SaveName"                                                   (postProcess.m)
+    Flag.saveSol = "alphaExpBeta50kVn2";              % "no"/"SaveName"                                                   (postProcess.m)
 
 
     % Hyperparameters 

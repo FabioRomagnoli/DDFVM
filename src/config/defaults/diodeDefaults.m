@@ -17,7 +17,10 @@ function [def, Param] = diodeDefaults(Param)
     
     def.V0 = 1.4;                   % Starting voltage (r=1) [V]
     def.VT = 1.4;                   % Ending voltage (r=end) [V]
-    
+    def.EndV0 = 0;
+    def.EndVT = 0;
+
+
     % Diode related constants
     def.N = 10^22;                    % density constant [m-3]
     def.case = 3;

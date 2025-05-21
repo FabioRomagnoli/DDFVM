@@ -77,7 +77,15 @@ function Dati = datiPlasma(Param, Flag)
         Dati.Vt = @(t)  (t <= Dati.T-Dati.T/100) * (Dati.V0 + (Dati.VT - Dati.V0)/(Dati.T*0.99)*t) + ...
                         (Dati.T-Dati.T/100 < t )  * Dati.VT;
     end
+    
 
+    if strcmp(Flag.EndVT, "linear")
+        % linear increase from V0 to VT
+        Dati.EndVt = @(t) Dati.V0 + (Dati.EndVT - Dati.EndV0)/Dati.T*t;
+    elseif strcmp(Flag.EndVT, "plateu")
+        Dati.EndVt = @(t)  (t <= Dati.T-Dati.T/100) * (Dati.EndV0 + (Dati.EndVT - Dati.EndV0)/(Dati.T*0.99)*t) + ...
+                        (Dati.T-Dati.T/100 < t )  * Dati.EndVT;
+    end
 
     Dati.tsave = linspace(0, Dati.T, Dati.K+1);
 
@@ -153,12 +161,24 @@ function AD = adimPlasma(D, Flag)
                         (AD.T-AD.T/100 < t )  * AD.VT;
     end
 
+
+    if strcmp(Flag.EndVT, "linear")
+        % linear increase from V0 to VT
+        AD.EndVt = @(t) AD.EndV0 +(AD.EndVT - AD.EndV0)/AD.T * t;
+    elseif strcmp(Flag.EndVT, "plateu")
+        AD.EndVt = @(t)  (t <= AD.T-AD.T/100) * (AD.EndV0 + (AD.EndVT - AD.EndV0)/(AD.T*0.99)*t) + ...
+                        (AD.T-AD.T/100 < t )  * AD.EndVT;
+    end
+
     % vectors
     AD.p0 = D.p0/AD.nbar;
     AD.n0 = D.n0/AD.nbar;
     AD.v0 = D.v0/AD.Vbar;
     AD.x0 = [AD.v0; AD.n0; AD.p0];
     
+    % Concatenate all together into a single array
+    AD.xBarVec = [repmat(AD.Vbar, 1, AD.lr), repmat(AD.nbar, 1, AD.lr), repmat(AD.nbar, 1, AD.lr)]';
+
     % Matrices
     AD.M_full = ax_mass(AD.r, 1);
     AD.M = AD.M_full(2:end-1,2:end-1);

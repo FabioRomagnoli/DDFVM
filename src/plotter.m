@@ -50,7 +50,7 @@ function concentrationPlot(Res, Dati, Flag)
 
         % grid on; 
         legend('Interpreter', 'latex');        
-        set(gca, 'YScale', 'log')
+        % set(gca, 'YScale', 'log')
         % set(gca, 'XScale', 'log')
         % axis([Dati.r0,Dati.r1,1e7,1e15])
         xlabel('Position (m)');           % x-axis label
@@ -214,7 +214,7 @@ function experimentalCurrentPotentialPlot(Res, Dati, Flag)
 
     hold on; 
 
-    plot(Res.Sol(1,:),Res.JJv(:,1), "b", 'DisplayName', 'Simulation');
+    plot(Res.Sol(1,:) - Res.Sol(Dati.lr,:),Res.JJv(:,1), "b", 'DisplayName', 'Simulation');
 
     plot(dataPlourabu(:,1)*1e3,dataPlourabu(:,2)*1e-3,"k-s", 'DisplayName', 'Experimental')
 
@@ -224,10 +224,10 @@ function experimentalCurrentPotentialPlot(Res, Dati, Flag)
     % set(gca, 'YScale', 'log') % Change y-axis to log scale
     % set(gca, 'XScale', 'log') % Change y-axis to log scale
 
-    xlim([2e4 3.5e4]);
-    ylim([0 2e-4]);
+    % xlim([2e4 3.5e4]);
+    % ylim([0 2e-4]);
 
     legend('Location', 'best'); 
-    ylabel("RHS [1/(ms)]");
+    % ylabel("RHS [1/(ms)]");
 
 end

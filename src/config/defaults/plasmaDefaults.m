@@ -14,6 +14,9 @@ function [def, Param] = plasmaDefaults(Param)
     def.V0 = def.Vz;                   % Voltage at r=1 and t=1  [V]
     def.VT = def.Vz;   
     
+    def.EndV0 = 0;
+    def.EndVT = 0;
+
     % PHYSICAL PARAMETERS 
     def.eps = 8.8e-12;             % Permittivity              [C]/([V][m])
     def.mup = 2e-4;                    % Diffusivity coefficients  [m2]/([s][V])

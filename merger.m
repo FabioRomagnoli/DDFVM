@@ -1,20 +1,25 @@
-clear all
+clear all;
 
-% PLASMA CASES
-% loadSol = "plasmaConstGen.mat";               % constant generation term in ion zone
-% loadSol = "plasmaConstAlpha.mat";             % very short sim time with const alpha but very wrong current
-% loadSol = "alphaExpBeta3e5.full.mat";         % with beta found through const gen term comparison
-% loadSol = "alphaExpBeta7e5.full.mat";         % 1.614e-04  first result that worked beta value from papers
-loadSol = "alphaExpBeta7e5newMu.full.mat";    % 1.608e-04, params mu taken from papers 2 sec
-% loadSol = "alphaExpBeta7e5-100sec.mat";       % 1.608e-04  100 sec 
-% loadSol = "alphaExpBeta7e5cells101.mat";      % 1.360e-04 100 cells worst reslts
+f1Name = "alphaExpBeta7e5-100sec.mat";
+f2Name = "alphaExpBeta7e5-100sec_50kV_cont.mat";
+saveName = "alphaExpBeta7e5-100sec_50kV_full.mat";
 
-% LOAD SOLUTION AND DEF PARAMETERS
-load(fullfile(".\sim\", loadSol));
-fprintf("\nLoaded Solution %s",loadSol);
 
-% POST PROCESSING IF NECESSARY
-file.Flag.saveSol = loadSol;     % !!Risk of overriding
-file.Flag.computeCurrents = true;
+f1 = load(fullfile(".\sim\", f1Name)).file;
+f2 = load(fullfile(".\sim\", f2Name)).file;
 
-postProcess(file.Dati, file.ADati, file.Res, file.Flag, file.Param);
+%  fix for wrong adim
+% f1xBarVec = [repmat(f1.ADati.Vbar, 1, f1.ADati.lr), repmat(f1.ADati.nbar, 1, f1.ADati.lr), repmat(f1.ADati.nbar, 1, f1.ADati.lr)]';
+% f2xBarVec = [repmat(f2.ADati.Vbar, 1, f2.ADati.lr), repmat(f2.ADati.nbar, 1, f2.ADati.lr), repmat(f2.ADati.nbar, 1, f2.ADati.lr)]';
+% f2.Res.Sol(:,1) = (f2.Res.Sol(:,1) ./ f2xBarVec) .* f1xBarVec;
+
+file = f1;
+file.Dati.T = f1.Dati.T + f2.Dati.T;
+file.Dati.K = f1.Dati.K + f2.Dati.K;
+file.Res.ASol = [f1.Res.ASol, f2.Res.ASol];
+file.Res.Sol = [f1.Res.Sol, f2.Res.Sol];
+file.Res.elapsedTime = f1.Res.elapsedTime + f2.Res.elapsedTime;
+file.Res.kf = f1.Res.kf + f2.Res.kf;
+
+save(fullfile(".\sim\", saveName), 'file');
+fprintf("\nSaved Solution to %s.m \n",saveName);

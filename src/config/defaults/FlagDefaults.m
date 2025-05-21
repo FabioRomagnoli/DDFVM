@@ -11,6 +11,8 @@ function def = FlagDefaults()
     % TIME 
     def.adaptive = true;                % Enable adaptive time stepping
     def.VT = "plateu";                  % Voltage evolution: "linear", "piecewise", or "plateu"
+    def.EndVT = "plateu";                  % Voltage evolution: "linear", "piecewise", or "plateu"
+
     def.computeCurrents = true;               % Computes current at every time step
 
     % DIODE ONLY
