@@ -238,7 +238,7 @@ function characteristicCurvePlot(Res, Dati, Flag, Param)
 
 
     grid on;
-    set(gca, 'YScale', 'log') % Change y-axis to log scale
+    % set(gca, 'YScale', 'log') % Change y-axis to log scale
     % set(gca, 'XScale', 'log') % Change y-axis to log scale
 
     % xlim([2e4 3.5e4]);

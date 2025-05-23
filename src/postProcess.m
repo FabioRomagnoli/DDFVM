@@ -77,8 +77,11 @@ function Res = computeCurrents(Dati,Res, Flag, Param)
         fprintf('\nJJ is not constant.');
     end
 
+    if strcmp(Flag.model, "plasma")
+        Param.Vbias = 0;
+    end
 
-    Res.Vplot = (Param.Vbias -  Res.Sol(1,:) -  Res.Sol(Dati.lr,:));
+    Res.Vplot = Res.signConv*(Res.Sol(1,:) -  Res.Sol(Dati.lr,:)) + abs(Param.Vbias);
     % device length to integrate, should be mass matrix
     Res.Iplot = Res.DeviceLength*Res.signConv*Res.JJ;
 

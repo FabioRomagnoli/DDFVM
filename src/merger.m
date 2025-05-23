@@ -1,8 +1,8 @@
 clear all;
 
-f1Name = "alphaExpBeta7e5-100sec.mat";
-f2Name = "alphaExpBeta7e5-100sec_50kV_cont.mat";
-saveName = "alphaExpBeta7e5-100sec_50kV_full.mat";
+f1Name = "alphaExpBeta7e5cells101.mat";
+f2Name = "alphaExpBeta50kV_101cells.mat";
+saveName = "alphaExpBeta50kV_101cells_full.mat";
 
 
 f1 = load(fullfile(".\sim\", f1Name)).file;
