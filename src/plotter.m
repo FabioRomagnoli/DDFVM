@@ -1,4 +1,4 @@
-function plotter(Res, Dati, Flag)  
+function plotter(Res, Dati, Flag, Param)  
     % Concentration of each species
     concentrationPlot(Res, Dati, Flag);
 
@@ -11,7 +11,7 @@ function plotter(Res, Dati, Flag)
     % comparison of rhs generation, prev used for debugging plasma
     generationPlot(Res,Dati,Flag);
 
-    characteristicCurvePlot(Res,Dati,Flag);
+    characteristicCurvePlot(Res,Dati,Flag,Param);
 
     experimentalCurrentPotentialPlot(Res,Dati,Flag);
 
@@ -131,25 +131,12 @@ function currentPlot(Res, Dati, Flag)
 
     rhalf = (Dati.r(1:end-1) + Dati.r(2:end))/2;
     for k=ks:skip:Res.kf
-
-        vk = Res.Sol(Dati.vIdxs,k);
-        nk = Res.Sol(Dati.nIdxs,k);
-        pk = Res.Sol(Dati.pIdxs,k);
-
-        % Compute bimu bernulli only once
-        [Bp, Bn] = bimu_bernoulli (diff(vk) / Dati.Vth);
-
-        clf; % Clear figure before plotting new data
-
-        Jn = 2*pi*Dati.q*comp_current(Dati.r,Dati.mun,Dati.Vth,-1,nk, Bn, Bp);
-        Jp = 2*pi*Dati.q*comp_current(Dati.r,Dati.mup,Dati.Vth, 1,pk, Bp, Bn);
-        JJ = Jn + Jp;
-        title(['Current at V = ', num2str(vk(1))]);
-
+        clf;
+        title(['Current at V = ', num2str(Res.Vplot(k))]);
         hold on;
-        plot(rhalf,Jn, 'LineWidth', 1, "DisplayName","Jn");
-        plot(rhalf,Jp, 'LineWidth', 1, "DisplayName","Jp");
-        plot(rhalf,JJ, 'LineWidth', 1, "DisplayName","JJ");
+        plot(rhalf,Res.Jn(:,k), 'LineWidth', 1, "DisplayName","Jn");
+        plot(rhalf,Res.Jp(:,k), 'LineWidth', 1, "DisplayName","Jp");
+        plot(rhalf,Res.JJv(:,k), 'LineWidth', 1, "DisplayName","JJ");
         hold off;
 
         grid on; 
@@ -157,6 +144,7 @@ function currentPlot(Res, Dati, Flag)
         % set(gca, 'YScale', 'log')
         set(gca, 'XScale', 'log')
         drawnow;
+        pause(0.1);
     end
     
 end
@@ -219,7 +207,7 @@ function experimentalCurrentPotentialPlot(Res, Dati, Flag)
 
     hold on; 
 
-    plot(Res.Sol(1,:) - Res.Sol(Dati.lr,:),Res.JJv(:,1), "b", 'DisplayName', 'Simulation');
+    plot(Res.Vplot,Res.JJ(1,:), "b", 'DisplayName', 'Simulation');
 
     plot(dataPlourabu(:,1)*1e3,dataPlourabu(:,2)*1e-3,"k-s", 'DisplayName', 'Experimental')
 
@@ -238,21 +226,19 @@ function experimentalCurrentPotentialPlot(Res, Dati, Flag)
 end
 
 
-function characteristicCurvePlot(Res, Dati, Flag)
+function characteristicCurvePlot(Res, Dati, Flag, Param)
     if ~isfield(Flag, 'characteristicCurvePlot'), return; end
     if Flag.characteristicCurvePlot == "none", return; end
-
-
 
     figure()
     title('Applied Voltage vs measured Current plot')
     hold on; 
-    plot(Res.Sol(1,:) - Res.Sol(Dati.lr,:),Res.JJv(:,1), "b", 'DisplayName', 'Simulation');
+    plot(Res.Vplot(2:end),Res.Iplot(2:end), "b", 'DisplayName', 'Simulation');
     hold off;
 
 
     grid on;
-    % set(gca, 'YScale', 'log') % Change y-axis to log scale
+    set(gca, 'YScale', 'log') % Change y-axis to log scale
     % set(gca, 'XScale', 'log') % Change y-axis to log scale
 
     % xlim([2e4 3.5e4]);
@@ -260,7 +246,7 @@ function characteristicCurvePlot(Res, Dati, Flag)
 
     legend('Location', 'best'); 
     % ylabel("RHS [1/(ms)]");
-
+    
 end
 
 

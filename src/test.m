@@ -1,7 +1,7 @@
 clear all
 
 % Residual Plot
-loadSol = "diode\diodeCase2.mat";
+loadSol = "diode\diodeCase3.mat";
 sol1 = load(fullfile(".\sim\", loadSol)).file;
 
 % 
@@ -10,7 +10,7 @@ sol1 = load(fullfile(".\sim\", loadSol)).file;
 % 
 
 
-%% N concentration
+% concentration start
 figure();
 % res = sol1.Res.Sol(Adaptive.Dati.nIdxs,end) - sol2.Res.Sol(sol1.Dati.nIdxs,end); 
 
@@ -20,8 +20,8 @@ figure();
 
 figure();
 hold on;
-semilogy(sol1.Dati.r,sol1.Res.Sol(sol1.Dati.nIdxs,1),'DisplayName',"n")   % first concentration
-semilogy(sol1.Dati.r,sol1.Res.Sol(sol1.Dati.pIdxs,1),'DisplayName',"p")   % first concentration
+semilogy(sol1.Dati.r,sol1.Res.Sol(sol1.Dati.nIdxs,1),'r','LineWidth', 2,'DisplayName',"n")   % first concentration
+semilogy(sol1.Dati.r,sol1.Res.Sol(sol1.Dati.pIdxs,1),'b','LineWidth', 2,'DisplayName',"p")   % first concentration
 hold off;
 set(gca, 'YScale', 'log') % Change y-axis to log scale
 legend('Location', 'best'); 

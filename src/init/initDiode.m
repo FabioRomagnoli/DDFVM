@@ -86,22 +86,14 @@ function Dati = datiDiode(Param, Flag)
         Na = 1e24; % [1/m^3] - P-side (inner part)
         Nd = 1e22; % [1/m^3] - N-side (outer part)
     
-        % Define junction at r = 1 + 500e-9 m
-        % P-side for r <= 1 + 500e-9
-        % N-side for r >  1 + 500e-9
         Dati.N = Nd * (Dati.r > 1 + 500e-9) - Na * (Dati.r <= 1 + 500e-9);
     
         % Equilibrium carrier concentrations
         n0 = (Dati.N + sqrt(Dati.N.^2 + 4 * Dati.ni^2)) / 2;
         p0 = (-Dati.N + sqrt(Dati.N.^2 + 4 * Dati.ni^2)) / 2;
-    
-        % Ensure numerical stability in high doping regions
         p0(Dati.N > 0) = Dati.ni^2 ./ n0(Dati.N > 0); % N-side
         n0(Dati.N < 0) = Dati.ni^2 ./ p0(Dati.N < 0); % P-side
-    elseif Param.case == 6
-        %....
     end
-
 
 
 
@@ -135,24 +127,30 @@ function Dati = datiDiode(Param, Flag)
         Dati.Vt = @(t) Dati.V0 + (Dati.VT - Dati.V0)/Dati.T*t;
     elseif strcmp(Flag.VT, "piecewise")
         % Attempt at piecewise V(t), steady for short period at V0 and VT
-        Dati.Vt = @(t) (t <= Dati.T/100) * Dati.V0 + ...
-                       (Dati.T/100 < t && t <= Dati.T-Dati.T/100) * (Dati.V0 + (Dati.VT - Dati.V0)/(Dati.T*0.98)*t) + ...
-                       (Dati.T-Dati.T/100 < t )  * Dati.VT;
+        Dati.Vt = @(t) (t <= 0.01*Dati.T) .* Dati.V0           + ...
+                        (t >  0.01*Dati.T & t <= 0.99*Dati.T) .* (Dati.V0 + (Dati.VT - Dati.V0)/(0.98*Dati.T) .* (t - 0.01*Dati.T)) + ...
+                        (t >  0.99*Dati.T) .* Dati.VT;
     elseif strcmp(Flag.VT, "plateu")
-        Dati.Vt = @(t)  (t <= Dati.T-Dati.T/100) * (Dati.V0 + (Dati.VT - Dati.V0)/(Dati.T*0.99)*t) + ...
-                        (Dati.T-Dati.T/100 < t )  * Dati.VT;
+        Dati.Vt = @(t) (t <= 0.99*Dati.T) .* (Dati.V0 + (Dati.VT - Dati.V0) ./ (0.99*Dati.T) .* t) + ...
+                       (t >  0.99*Dati.T) .* Dati.VT;
     end
 
 
     if strcmp(Flag.EndVT, "linear")
         % linear increase from V0 to VT
         Dati.EndVt = @(t) Dati.V0 + (Dati.EndVT - Dati.EndV0)/Dati.T*t;
+    elseif strcmp(Flag.EndVT, "piecewise")
+        % Attempt at piecewise V(t), steady for short period at V0 and VT
+        Dati.EndVt = @(t) (t <= 0.01*Dati.T) .* Dati.EndV0           + ...
+                        (t >  0.01*Dati.T & t <= 0.99*Dati.T) .* (Dati.EndV0 + (Dati.EndVT - Dati.EndV0)/(0.98*Dati.T) .* (t - 0.01*Dati.T)) + ...
+                        (t >  0.99*Dati.T) .* Dati.EndVT;
     elseif strcmp(Flag.EndVT, "plateu")
-        Dati.EndVt = @(t)  (t <= Dati.T-Dati.T/100) * (Dati.EndV0 + (Dati.EndVT - Dati.EndV0)/(Dati.T*0.99)*t) + ...
-                        (Dati.T-Dati.T/100 < t )  * Dati.EndVT;
+        Dati.EndVt = @(t) (t <= 0.99*Dati.T) .* (Dati.EndV0 + (Dati.EndVT - Dati.EndV0) ./ (0.99*Dati.T) .* t) + ...
+                       (t >  0.99*Dati.T) .* Dati.EndVT;
     end
 
     Dati.tsave = linspace(0, Dati.T, Dati.K+1);
+    Dati.M_full = ax_mass(Dati.r, 1);
 
 end
 
@@ -206,21 +204,26 @@ function AD = adimDiode(D, Flag)
         AD.Vt = @(t) AD.V0 +(AD.VT - AD.V0)/AD.T * t;
     elseif strcmp(Flag.VT, "piecewise")
         % Attempt at piecewise V(t), steady for short period at V0 and VT
-        AD.Vt = @(t) (t <= AD.T/100) * AD.V0 + ...
-                   (AD.T/100 < t && t <= AD.T-AD.T/100) * (AD.V0 + (AD.VT - AD.V0)/(AD.T*0.98)*t) + ...
-                   (AD.T-AD.T/100 < t )  * AD.VT;
+        AD.Vt = @(t) (t <= 0.01*AD.T) .* AD.V0           + ...
+                        (t >  0.01*AD.T & t <= 0.99*AD.T) .* (AD.V0 + (AD.VT - AD.V0)/(0.98*AD.T) .* (t - 0.01*AD.T)) + ...
+                        (t >  0.99*AD.T) .* AD.VT;
     elseif strcmp(Flag.VT, "plateu")
-        AD.Vt = @(t)  (t <= AD.T-AD.T/100) * (AD.V0 + (AD.VT - AD.V0)/(AD.T*0.99)*t) + ...
-                        (AD.T-AD.T/100 < t )  * AD.VT;
+        AD.Vt = @(t) (t <= 0.99*AD.T) .* (AD.V0 + (AD.VT - AD.V0) ./ (0.99*AD.T) .* t) + ...
+                       (t >  0.99*AD.T) .* AD.VT;
     end
 
 
     if strcmp(Flag.EndVT, "linear")
         % linear increase from V0 to VT
         AD.EndVt = @(t) AD.EndV0 +(AD.EndVT - AD.EndV0)/AD.T * t;
+    elseif strcmp(Flag.EndVT, "piecewise")
+        % Attempt at piecewise V(t), steady for short period at V0 and VT
+        AD.EndVt = @(t) (t <= 0.01*AD.T) .* AD.EndV0           + ...
+                        (t >  0.01*AD.T & t <= 0.99*AD.T) .* (AD.EndV0 + (AD.EndVT - AD.EndV0)/(0.98*AD.T) .* (t - 0.01*AD.T)) + ...
+                        (t >  0.99*AD.T) .* AD.EndVT;
     elseif strcmp(Flag.EndVT, "plateu")
-        AD.EndVt = @(t)  (t <= AD.T-AD.T/100) * (AD.EndV0 + (AD.EndVT - AD.EndV0)/(AD.T*0.99)*t) + ...
-                        (AD.T-AD.T/100 < t )  * AD.EndVT;
+        AD.EndVt = @(t) (t <= 0.99*AD.T) .* (AD.EndV0 + (AD.EndVT - AD.EndV0) ./ (0.99*AD.T) .* t) + ...
+                       (t >  0.99*AD.T) .* AD.EndVT;
     end
 
 

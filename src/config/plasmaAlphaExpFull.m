@@ -18,15 +18,15 @@ function [Param, Flag, Opt] = plasmaAlphaExp()
     Flag.VT = "plateu";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
     
     Flag.loadSol = "checkpoint";        % "no"/"checkpoint"/"SaveName"                                                (simulate.m)
-    Flag.saveSol = "alphaExpBeta50kV_81cells";              % "no"/"SaveName"                                                   (postProcess.m)
+    Flag.saveSol = "alphaExpBeta50kV_101cells";              % "no"/"SaveName"                                                   (postProcess.m)
 
 
     % Hyperparameters 
-    Param.lr = 81;                   % Space grid points
+    Param.lr = 101;                   % Space grid points
     Param.K = 1000;                  % Time grid points
     Param.dt = 1e-2;                 % Time separation [s]
-    Param.T = 200;                   % Total simulation time [s]
-    Param.V0 = 0;                    % Voltage at r=1 and t=1 [V]
+    Param.T = 70;                   % Total simulation time [s]
+    Param.V0 = 30174.7;                    % Voltage at r=1 and t=1 [V]
     Param.ZhengIdx = 54;
     
     Param.mup = 1.86e-4;             % Mobility for positive species

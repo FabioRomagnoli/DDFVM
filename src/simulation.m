@@ -82,17 +82,21 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
 
         if Flag.verbose >  1, fprintf("\n1) dt: "); end         % + dt
         [xNew, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt);
-        if isfield(info, 'exitflag') && info.exitflag == 0 && Flag.verbose, dt= dt*0.75; fprintf("\t Reducing dt to %g \n\n", dt); continue; end
+        if isfield(info, 'exitflag') && info.exitflag <= 0 && Flag.verbose 
+            dt= dt*0.75; fprintf("\t Reducing dt to %g \n\n", dt*AD.tbar); continue; 
+        end
 
         if Flag.adaptive
             if Flag.verbose > 1, fprintf("2) dt/2: "); end   % + dt/2
             [xTemp, info] = scheme(x0r, BCs, AD, Flag, Opt, t, dt/2);
-            if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
+            % if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
+            if isfield(info, 'exitflag') && info.exitflag <= 0 && Flag.verbose, dt= dt*0.75; fprintf("\t Reducing dt to %g \n\n", dt); continue; end
 
             if Flag.verbose > 1, fprintf("3) dt/2: "); end   % + dt/2
             [xTemp, info] = scheme(xTemp, BCs, AD, Flag, Opt, t+dt/2, dt/2);
-            if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
-    
+            % if isfield(info, 'exitflag') && info.exitflag < 0, error(info.output.message); end
+            if isfield(info, 'exitflag') && info.exitflag <= 0 && Flag.verbose, dt= dt*0.75; fprintf("\t Reducing dt to %g \n\n", dt); continue; end
+
             relativeError = computeRelErrors(xNew, xTemp, AD, Flag);
             timeScaling = max(0.5, min(1.3, AD.stepBuffer * (AD.tolError / relativeError)^AD.scalingPower));
             if Flag.verbose > 1, fprintf('\n  t =%12.4e \t  dt =%12.4e, \t Vt = %12.6e \t EndVt = %12.6e \t scale = %g', t*AD.tbar, dt*AD.tbar, AD.Vt(t+dt)*AD.Vbar, AD.EndVt(t+dt)*AD.Vbar,  timeScaling); end
@@ -103,6 +107,7 @@ function [x0, dtBest] = timeSteppingLoop(AD, Flag, Opt, x0, t, t1, dt)
 
                     % Update boundary and interior solution
                     x0(1) = AD.Vt(t);           % Update boundary condition
+                    x0(AD.lr) =  AD.EndVt(t);
                     x0(AD.intIdxs) = xNew;         % Update the interior solution
                 
                     % Increase time step for next step

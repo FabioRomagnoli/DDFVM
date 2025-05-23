@@ -10,8 +10,8 @@ function [def, Param] = diodeDefaults(Param)
     def.eps = 1.035e-10;               % Permittivity              [C]/([V][m])
     def.q = 1.6e-19;                   % Charge                    [C] 
     def.mu = 0.1;                    % Diffusivity coefficients  [m2]/([s][V])
-    def.mun = def.mu;
-    def.mup = def.mu;
+    def.mun = 0.135;
+    def.mup = 0.048;
     def.Vth = 26e-3;   
     def.tau = 1e-11;
     

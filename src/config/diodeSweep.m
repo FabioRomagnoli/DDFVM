@@ -8,9 +8,9 @@ function [Param, Flag, Opt] = diodeCase3()
     Flag.method = "fsolve";         % "fsolve"/"newton"
     
     Flag.VT = "linear";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
-    Flag.EndVT = "linear";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
+    Flag.EndVT = "plateu";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
 
-    Flag.adaptive = true;        
+    Flag.adaptive = false;        
     Flag.mesh = "linear";           % "linear"/"tanh"
 
 
@@ -19,23 +19,43 @@ function [Param, Flag, Opt] = diodeCase3()
         
     
     % Hyperparameters Diode
-    Param.K = 100;                   %Time grid points
-    Param.lr = 201;
-    Param.T = 1e-4;                   % Total simulation time [s]
+    Param.K = 50;                   %Time grid points
+    Param.lr = 51;
+    Param.T = 0.001;                   % Total simulation time [s]
+    Param.dt = 1e-5;               % Time separation  [s]
 
-    Param.dt = 1e-14;               % Time separation  [s]
+    % Param.dtMin = 1e-15;
+    Param.dtMax = 1e-5;
 
-    Param.V0 = -2;                    % Voltage at r=1 and t=1 [V]
-    Param.VT = 2;                 % Ending voltage (r=end) [V]
-    % Param.EndV0 = -0.5;
-    % Param.EndVT = 0.8;
 
-    Param.case = 2;
-    
+    % TO FIND THE BIAS do a forward bias run. (
+    % Param.case = 5;               % higher p on the inside
+    % Param.Vbias = -0.86352;
+    % Param.V0 = Param.Vbias; 
+    % Param.VT = Param.Vbias;
+    % Param.EndV0 = 0;              % N pole 
+    % Param.EndVT = 0;              % N pole en
+    % % Decrease EdnVT for forward bias, 
+    % % inrease  it for reverse
+
+   
+
+    Param.case = 2;                 % higher n on the inside
+    Param.Vbias = -0.86352;
+    Param.V0 = 0;              % N pole 
+    Param.VT = -1;              % N pole en
+    Param.EndV0 = Param.Vbias; 
+    Param.EndVT = Param.Vbias;
+    % Dicrease VT for forwards
+    % incease for reverse
+
+
+
+
     % Fsolve flags
     Opt.Display = "off";                    % "off"/"iter"/"final"/"final-detailed"     
     Opt.SpecifyObjectiveGradient = true;    % Jacobian or no Jacobian
-
+    Opt.FunctionTolerance = 1e-4;
 end
 
 

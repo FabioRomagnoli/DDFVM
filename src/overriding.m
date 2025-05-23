@@ -1,7 +1,7 @@
 clear all
 
 % PLASMA CASES
-loadSol = "alphaExpBeta7e5-100sec_50kV_full.mat";
+loadSol = "diode\diodeSweep.mat";
 
 % LOAD SOLUTION AND DEF PARAMETERS
 load(fullfile(".\sim\", loadSol));

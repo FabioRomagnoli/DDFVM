@@ -26,6 +26,16 @@ The last line says whether the full time step was good enough to be accepted or 
 
 
 
+
+% DIODE CASES
+% loadSol = "diode\diodeCase1.mat";         % TDE n doped
+% loadSol = "diode\diodeCase2.mat";         % TDE assymmetrically doped, higher n on the inside
+% loadSol = "diode\diodeCase3.mat";         % TDE with zone in between, higher n on the inside
+% loadSol = "diode\diodeCase4.mat";         % TO REDO it was overwritten by a case 3, but should be symmetrically doped n inside
+% loadSol = "diode\diodeCase5.mat";         % higher p on the inside
+    
+
+
 implemented 
 - newton
 - piecewise voltage increase

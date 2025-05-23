@@ -39,7 +39,7 @@ function [userParam, Dati, ADati, Flag, Results] = main(configName)
     Results = postProcess(Dati, ADati, Results, Flag, Param);
     
     % Plotting configuration 
-    plotter(Results, Dati, Flag);
+    plotter(Results, Dati, Flag, Param);
 
 end
 
