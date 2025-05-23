@@ -83,7 +83,7 @@ function Res = computeCurrents(Dati,Res, Flag, Param)
 
     Res.Vplot = Res.signConv*(Res.Sol(1,:) -  Res.Sol(Dati.lr,:)) + abs(Param.Vbias);
     % device length to integrate, should be mass matrix
-    Res.Iplot = Res.DeviceLength*Res.signConv*Res.JJ;
+    Res.Iplot = Res.signConv*Res.JJ;
 
     if strcmp(Flag.model, "diode")
         % To get the bias voltage

@@ -3,7 +3,7 @@ function plotter(Res, Dati, Flag, Param)
     concentrationPlot(Res, Dati, Flag);
 
     % Potential V
-    potentialPlot(Res, Dati, Flag);
+    potentialPlot(Res, Dati, Flag,Param);
 
     % Electrical  current J
     currentPlot(Res, Dati, Flag);
@@ -67,7 +67,7 @@ function concentrationPlot(Res, Dati, Flag)
     end
 end
 
-function potentialPlot(Res, Dati, Flag)
+function potentialPlot(Res, Dati, Flag,Param)
     if isfield(Flag, 'potentialPlot')
         switch Flag.potentialPlot
             case "none"
@@ -91,7 +91,7 @@ function potentialPlot(Res, Dati, Flag)
     for k = ks:skip:Res.kf
 
         clf; % Clear figure before plotting new data
-        vk = Res.Sol(Dati.vIdxs, k);
+        vk = Res.Sol(Dati.vIdxs, k) + abs(Param.Vbias);
         
         plot(Dati.r, vk, 'LineWidth', 1, "DisplayName", "v");
         
@@ -100,7 +100,8 @@ function potentialPlot(Res, Dati, Flag)
         
         xlabel('Position (m)');         % x-axis label
         ylabel('Potential (V)');         % y-axis label
-        
+        % set(gca, 'YScale', 'log')
+        % set(gca, 'XScale', 'log')
         drawnow;
     end
 end
@@ -134,9 +135,9 @@ function currentPlot(Res, Dati, Flag)
         clf;
         title(['Current at V = ', num2str(Res.Vplot(k))]);
         hold on;
-        plot(rhalf,Res.Jn(:,k), 'LineWidth', 1, "DisplayName","Jn");
-        plot(rhalf,Res.Jp(:,k), 'LineWidth', 1, "DisplayName","Jp");
-        plot(rhalf,Res.JJv(:,k), 'LineWidth', 1, "DisplayName","JJ");
+        plot(rhalf,Res.signConv*Res.Jn(:,k), 'LineWidth', 1, "DisplayName","Jn");
+        plot(rhalf,Res.signConv*Res.Jp(:,k), 'LineWidth', 1, "DisplayName","Jp");
+        plot(rhalf,Res.signConv*Res.JJv(:,k), 'LineWidth', 1, "DisplayName","JJ");
         hold off;
 
         grid on; 

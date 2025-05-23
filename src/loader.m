@@ -7,7 +7,7 @@
 % loadSol = "alphaExp50kV_101cells.mat";           % FULL 101 cell
 
 % DIODE CASES
-% loadSol = "diode\diodeSweep.mat";
+loadSol = "diode\diodeSweep.mat";
 
 % LOAD SOLUTION AND DEF PARAMETERS
 load(fullfile(".\sim\", loadSol));
@@ -24,12 +24,12 @@ Res = postProcess(file.Dati, file.ADati, file.Res, file.Flag, file.Param);
 
 
 % PLOTTING
-% file.Flag.concentrationPlot = "reduced";    % "all"/"last"/"none"
-% file.Flag.potentialPlot = "reduced";
-% file.Flag.currentPlot = "reduced";
+file.Flag.concentrationPlot = "all";    % "all"/"last"/"none"
+% file.Flag.potentialPlot = "all";
+% file.Flag.currentPlot = "last";
 % file.Flag.generationPlot = "none";
-% file.Flag.characteristicCurvePlot = "Y";
-file.Flag.experimentalCurrentPotentialPlot = "Y";
+file.Flag.characteristicCurvePlot = "Y";
+% file.Flag.experimentalCurrentPotentialPlot = "Y";
 % file.Flag.experimentalConcentrationPositiveIonPlot = "Y";
 % file.Flag.experimentalPotentialPlot = "Y";
 plotter(Res,file.Dati,file.Flag, file.Param);
