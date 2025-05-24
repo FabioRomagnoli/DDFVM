@@ -22,6 +22,9 @@ function [Param, Flag, Opt] = diodeCase1()
     Param.VT = 1;                 % Ending voltage (r=end) [V]
     Param.case = 1;
     
+    Param.Vbias = 0;
+
+
     % Fsolve flags
     Opt.Display = "off";                    % "off"/"iter"/"final"/"final-detailed"     
     Opt.SpecifyObjectiveGradient = true;    % Jacobian or no Jacobian

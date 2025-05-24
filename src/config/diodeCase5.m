@@ -27,6 +27,7 @@ function [Param, Flag, Opt] = diodeCase3()
     Param.VT = 0;                 % Ending voltage (r=end) [V]
     Param.EndV0 = -0.5;
     Param.EndVT = 0.8;
+    Param.Vbias = 0;
 
 
     Param.case = 5;

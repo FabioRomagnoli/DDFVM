@@ -25,7 +25,8 @@ function [Param, Flag, Opt] = diodeCase3()
     Param.dt = 1e-10;               % Time separation  [s]
     Param.VT = 1.4;                 % Ending voltage (r=end) [V]
     Param.case = 3;
-    
+    Param.Vbias = 0;
+
     Param.stepBuffer = 0.8;
     Param.scalingPower = 0.3;
     Param.dtMin = 1e-17;

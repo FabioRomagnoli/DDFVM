@@ -7,15 +7,15 @@ function [Param, Flag, Opt] = diodeCase3()
     Flag.scheme = "coupled";
     Flag.method = "fsolve";         % "fsolve"/"newton"
     
-    Flag.VT = "piecewise";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
-    Flag.EndVT = "piecewise";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
+    Flag.VT = "linear";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
+    Flag.EndVT = "linear";                 % "linear"/"piecewise"/"plateu"  controls how VT changes in time    (init.m)
 
     Flag.adaptive = false;        
     Flag.mesh = "linear";           % "linear"/"tanh"
 
 
     Flag.loadSol =  "no";
-    Flag.saveSol = ".\diode\diodeSweep";
+    Flag.saveSol = ".\diode\diodeSweepCase4Reverse";
         
     
     % Hyperparameters Diode
@@ -62,9 +62,8 @@ function [Param, Flag, Opt] = diodeCase3()
     Param.case = 4;                 % higher n on the inside
     Param.Vbias = -0.73673;
     % Param.Vbias = 0;
-
     Param.V0 = 0;              % N pole 
-    Param.VT = -1;              % N pole en
+    Param.VT = 1;              % N pole en
     Param.EndV0 = Param.Vbias; 
     Param.EndVT = Param.Vbias;
     % Dicrease VT for forwards

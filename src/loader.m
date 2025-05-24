@@ -7,7 +7,9 @@
 % loadSol = "alphaExp50kV_101cells.mat";           % FULL 101 cell
 
 % DIODE CASES
-loadSol = "diode\diodeSweep.mat";
+loadSol = "diode\diodeSweepCase4Forward";
+% loadSol = "diode\diodeSweepCase4Reverse";
+
 
 % LOAD SOLUTION AND DEF PARAMETERS
 load(fullfile(".\sim\", loadSol));
@@ -24,7 +26,7 @@ Res = postProcess(file.Dati, file.ADati, file.Res, file.Flag, file.Param);
 
 
 % PLOTTING
-file.Flag.concentrationPlot = "all";    % "all"/"last"/"none"
+% file.Flag.concentrationPlot = "all";    % "all"/"last"/"none"
 % file.Flag.potentialPlot = "all";
 % file.Flag.currentPlot = "last";
 % file.Flag.generationPlot = "none";
