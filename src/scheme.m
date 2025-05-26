@@ -29,6 +29,27 @@ function [xSol, info] = scheme(xPrev, BCs, AD, Flag, Opt, t, dt)
             [xSol, info] = solver(funReact, xPrev, Opt, Flag, AD);
 
             if Flag.verbose > 2; fprintf("\n\t Transport:\t "); end
+
+            % % ATTEMPT at Internal substepping (e.g. to achieve smaller dt)
+            % t_sub = t;
+            % dt_sub = 1e-11/AD.tbar;  % desired smaller timestep
+            % n_substeps = round(dt / dt_sub);  % number of substeps
+            % for i_sub = 1:n_substeps
+            %     BCs(1) = AD.Vt(t_sub+dt_sub);
+            % 	BCs(2) = AD.EndVt(t_sub+dt_sub);
+            %     % Create function for the smaller timestep
+            %     funTrans = @(x) assemblerTransport(x, xSol, BCs, AD, dt_sub, Flag);
+            % 
+            %     % Call the solver for each substep
+            %     Opt.SpecifyObjectiveGradient = true;
+            %     [xSol, info] = solver(funTrans, xSol, Opt, Flag, AD);
+            %     t_sub = t_sub + dt_sub;
+            %     if Flag.verbose > 2
+            %         fprintf("Substep %d/%d completed\n", i_sub, n_substeps);
+            %     end
+            % end
+
+            % Works properly
             funTrans = @(x) assemblerTransport(x, xSol, BCs, AD, dt,Flag);
             Opt.SpecifyObjectiveGradient = true;
             [xSol, info] = solver(funTrans, xSol, Opt, Flag, AD);

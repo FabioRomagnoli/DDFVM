@@ -7,7 +7,12 @@
 % loadSol = "alphaExp50kV_101cells.mat";           % FULL 101 cell
 
 % DIODE CASES
-loadSol = "diode\diodeSweepCase4Forward";
+% loadSol = "diode\diodeSweepCase4Forward";
+% loadSol = "diode\diodeSweepCase4ForwardSplit";
+loadSol = "diode\diodeSweepCase4ForwardCoupled";
+% loadSol = "diode\diodeSweepCase4ForwardSplitSub";
+
+
 % loadSol = "diode\diodeSweepCase4Reverse";
 
 
@@ -17,7 +22,7 @@ fprintf("\nLoaded Solution %s\n",loadSol);
 
 % OUTPUT CONFIGURATON
 printConfiguration(struct(),file.Param,struct(),file.Flag,struct(),struct());
-
+fprintf("'\nElapsed Time: %g", file.Res.elapsedTime);
 
 % % POST PROCESSING IF NECESSARY
 file.Flag.saveSol = loadSol;     % !!Risk of overriding   /   loadSol
@@ -30,7 +35,7 @@ Res = postProcess(file.Dati, file.ADati, file.Res, file.Flag, file.Param);
 % file.Flag.potentialPlot = "all";
 % file.Flag.currentPlot = "last";
 % file.Flag.generationPlot = "none";
-file.Flag.characteristicCurvePlot = "Y";
+% file.Flag.characteristicCurvePlot = "Y";
 % file.Flag.experimentalCurrentPotentialPlot = "Y";
 % file.Flag.experimentalConcentrationPositiveIonPlot = "Y";
 % file.Flag.experimentalPotentialPlot = "Y";

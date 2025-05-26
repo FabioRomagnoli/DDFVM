@@ -2,7 +2,7 @@ function [Param, Flag, Opt] = plasmaSplit()
 
     % Simulation settings
     Flag.model = "plasma";               % Model selection
-    Flag.verbose = 2;
+    Flag.verbose = 4;
    
     Flag.scheme = "split";            % "coupled"/"split"                                                 (scheme.m)
     Flag.method = "fsolve";             % "fsolve"/"newton"                                                 (scheme.m)
@@ -28,7 +28,7 @@ function [Param, Flag, Opt] = plasmaSplit()
     Param.lr = 51;                   % Space grid points
     Param.K = 1000;                  % Time grid points
     Param.dt = 1e-4;                 % Time separation [s]
-    Param.T = 100;                   % Total simulation time [s]
+    Param.T = 1;                   % Total simulation time [s]
     Param.V0 = 0;                    % Voltage at r=1 and t=1 [V]
     Param.tolError = 1e-3;          % Adaptive time stepping tollerance
 

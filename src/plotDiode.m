@@ -1,5 +1,6 @@
-loadSol = "diode\diodeSweepCase4Forward.mat";
-loadSol = "diode\diodeSweepCase4Reverse.mat";
+% loadSol = "diode\diodeSweepCase4Forward.mat";
+% loadSol = "diode\diodeSweepCase4Reverse.mat";
+loadSol = "diode\diodeSweepCase4ForwardSplit.mat";
 
 % LOAD SOLUTION AND DEF PARAMETERS
 
