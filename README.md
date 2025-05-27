@@ -7,8 +7,21 @@ To run the code input the parameters that you want to input a config file (a fun
 the ones not specified will be taken from default values specified in the corresponding init file in config defaults folder and are also
 outputted at every run. A few example configs are found in the folder.
 can be run in command line with:
+
       [userParam, Dati, ADati, Flag, Results] = main(%NAMEOFCONFIGFILE%);
-i.e.  [userParam, Dati, ADati, Flag, Results] = main('diodeCase1');
+
+Some examples that can be run within reasonable time are:
+
+[userParam, Dati, ADati, Flag, Results] = main('diodeCase4');
+
+[userParam, Dati, ADati, Flag, Results] = main('diodeSweepSplit');
+
+This one may take a long time
+
+[userParam, Dati, ADati, Flag, Results] = main('plasmaAlphaExp');
+
+
+
 
 The solver can run with fsolve or with newton (if the jacobian is implemented). 
 The code if specified will use an adaptive time stepping scheme, the parameters of which can be tuned. The output (if verbose)
