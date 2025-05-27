@@ -2,14 +2,14 @@
 
 % PLASMA CASES
 % FULL SIMULATIONS 
-% loadSol = "alphaExp50kV_51cells.mat";         % FULL 51 cells
+loadSol = "alphaExp50kV_51cells.mat";         % FULL 51 cells
 % loadSol = "alphaExp50kV_81cells.mat";                 % FULL 81 cells
 % loadSol = "alphaExp50kV_101cells.mat";           % FULL 101 cell
 
 % DIODE CASES
 % loadSol = "diode\diodeSweepCase4Forward";
 % loadSol = "diode\diodeSweepCase4ForwardSplit";
-loadSol = "diode\diodeSweepCase4ForwardCoupled";
+% loadSol = "diode\diodeSweepCase4ForwardCoupled";
 % loadSol = "diode\diodeSweepCase4ForwardSplitSub";
 
 

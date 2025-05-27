@@ -1,7 +1,7 @@
 clear all
 
 % Residual Plot
-loadSol = "diode\diodeSweep.mat";
+loadSol = "diode\diodeSweepCase4Forward.mat";
 sol1 = load(fullfile(".\sim\", loadSol)).file;
 
 % 
@@ -18,9 +18,10 @@ figure();
 % semilogy(sol2.Res.Sol(sol2.Dati.nIdxs,end))   % n sol2
 
 figure();
+plot(sol1.Dati.r,sol1.Res.Sol(sol1.Dati.nIdxs,1),'r','LineWidth', 1,'DisplayName',"n")   % first concentration
 hold on;
-semilogy(sol1.Dati.r,sol1.Res.Sol(sol1.Dati.nIdxs,1),'r','LineWidth', 1,'DisplayName',"n")   % first concentration
-semilogy(sol1.Dati.r,sol1.Res.Sol(sol1.Dati.pIdxs,1),'b','LineWidth', 1,'DisplayName',"p")   % first concentration
+
+plot(sol1.Dati.r,sol1.Res.Sol(sol1.Dati.pIdxs,1),'b','LineWidth', 1,'DisplayName',"p")   % first concentration
 hold off;
 xlabel('Position (m)');           % x-axis label
 ylabel('Concentration (m^{-3})'); % y-axis label

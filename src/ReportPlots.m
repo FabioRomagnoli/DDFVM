@@ -1,7 +1,7 @@
 %% Plasma Characterstic Plot
 clear all;
 figure()
-title('Applied Voltage vs measured Current')
+title('Applied Potential vs measured Current')
 hold on; 
     
 dataPlourabu =  csvread("dati_esperimento_zheng\xx_PlourabuèData.csv");
@@ -30,8 +30,8 @@ xlim([20 52]);
 ylim([0 1.5]);
 
 legend('Location', 'best'); 
-ylabel("Current [mA/m]");
-xlabel("Voltage [kV]");
+ylabel("Current density [mA/m]");
+xlabel("Potential [kV]");
 
 
 
@@ -82,8 +82,8 @@ grid on;
 % ylim([0 1.5]);
 
 legend('Location', 'best'); 
-ylabel("Voltage [kV]");
-xlabel("Radius [m]");
+ylabel("Potential [kV]");
+xlabel("Position [m]");
 
 
 %% Plasma concentration Plot
@@ -131,4 +131,4 @@ set(gca, 'XScale', 'log') % Change y-axis to log scale
 
 legend('Location', 'best'); 
 ylabel("Concentration [m^{-3}]");
-xlabel("Radius [m]");
+xlabel("Position [m]");

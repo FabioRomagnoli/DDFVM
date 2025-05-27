@@ -56,8 +56,8 @@ function concentrationPlot(Res, Dati, Flag)
 
         % grid on; 
         legend('Interpreter', 'latex');        
-        % set(gca, 'YScale', 'log')
-        % set(gca, 'XScale', 'log')
+        set(gca, 'YScale', 'log')
+        set(gca, 'XScale', 'log')
         % axis([Dati.r0,Dati.r1,1e7,1e15])
         xlabel('Position (m)');           % x-axis label
         ylabel('Concentration (m^{-3})'); % y-axis label
